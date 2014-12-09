@@ -1,0 +1,30 @@
+12/1/2014 3:43:29 PM, C:\DropFolder\BackupReporter_2.0.0.14.msi, /mnt/share/Share/Xfer/R1, 55.98 MB, 12/1/2014 3:43:36 PM, 6 secs, 9.33 MB/sec
+12/2/2014 12:30:51 PM, C:\DropFolder\BackupReporter_2.0.0.14.msi, /mnt/share/Share/Xfer/R1, 55.98 MB, 12/2/2014 12:31:10 PM, 19 secs, 2.95 MB/sec
+12/2/2014 12:34:18 PM, C:\DropFolder\BackupReporter_2.0.0.14.msi, /mnt/share/Share/Xfer/R1, 55.98 MB, 12/2/2014 12:34:33 PM, 14 secs, 4 MB/sec
+12/2/2014 12:34:23 PM, C:\DropFolder\BenchmarkFactory_7_1_0_490_32bit.msi, /mnt/share/Share/Xfer/R1, 87.81 MB, 12/2/2014 12:36:27 PM, 4 secs, 21.95 MB/sec
+12/2/2014 1:19:20 PM, C:\DropFolder\BackupReporter_2.0.0.14.msi, /mnt/share/Share/Xfer/R1, 55.98 MB, 12/2/2014 1:19:41 PM, 20 secs, 2.8 MB/sec
+12/2/2014 1:20:40 PM, C:\DropFolder\BackupReporter_2.0.0.14.msi, /mnt/share/Share/Xfer/R1, 55.98 MB, 12/2/2014 1:20:49 PM, 8 secs, 7 MB/sec
+12/2/2014 1:23:25 PM, C:\DropFolder\DellCodeTesterOracle_2.6.3.980_Freeware.msi, /mnt/share/Share/Xfer/R1, 43.14 MB, 12/2/2014 1:24:52 PM, 27 secs, 1.6 MB/sec
+12/2/2014 2:06:10 PM, C:\DropFolder\BackupReporter_2.0.0.14.msi, /mnt/share/Share/Xfer/R1, 55.98 MB, 12/2/2014 2:06:19 PM, 9 secs, 6.22 MB/sec
+12/2/2014 2:12:01 PM, C:\DropFolder\DellCodeTesterOracle_2.6.3.980.msi, /mnt/share/Share/Xfer/R1, 43.14 MB, 12/2/2014 2:13:40 PM, 38 secs, 1.14 MB/sec
+12/2/2014 2:27:20 PM, C:\DropFolder\BackupReporter_2.0.0.14.msi, /mnt/share/Share/Xfer/R1, 55.98 MB, 12/2/2014 2:27:27 PM, 6 secs, 9.33 MB/sec
+12/2/2014 2:28:05 PM, C:\DropFolder\DellCodeTesterOracle_2.6.3.980.msi, /mnt/share/Share/Xfer/R1, 43.14 MB, 12/2/2014 2:28:11 PM, 5 secs, 8.63 MB/sec
+12/2/2014 2:28:10 PM, C:\DropFolder\BackupReporter_2.0.0.14.msi, /mnt/share/Share/Xfer/R1, 55.98 MB, 12/2/2014 2:28:15 PM, 5 secs, 11.2 MB/sec
+12/2/2014 2:28:55 PM, C:\DropFolder\QuestSQLOptimizerForOracle_8_9_1_3185_Trial_32bit.msi, /mnt/share/Share/Xfer/R1, 77.18 MB, 12/2/2014 2:31:37 PM, 41 secs, 1.88 MB/sec
+12/2/2014 2:29:10 PM, C:\DropFolder\QuestSQLOptimizerForOracle_8_9_1_3185_64bit.msi, /mnt/share/Share/Xfer/R1, 84.63 MB, 12/2/2014 2:31:41 PM, 30 secs, 2.82 MB/sec
+12/2/2014 2:29:00 PM, C:\DropFolder\QuestSQLOptimizerForOracle_8_9_1_3185_32bit.msi, /mnt/share/Share/Xfer/R1, 77.25 MB, 12/2/2014 2:31:42 PM, 41 secs, 1.88 MB/sec
+12/2/2014 3:17:01 PM, C:\DropFolder\QuestSQLOptimizerForOracle_8_9_1_3185_64bit.msi, /mnt/share/Share/Xfer/R1, 84.63 MB, 12/2/2014 3:17:08 PM, 7 secs, 12.09 MB/sec
+12/2/2014 3:17:16 PM, C:\DropFolder\Spotlight on Oracle 10.2.1.1504.msi, /mnt/share/Share/Xfer/R1, 139.59 MB, 12/2/2014 3:21:01 PM, 45 secs, 3.1 MB/sec
+12/2/2014 3:26:27 PM, C:\DropFolder\DellCodeTesterOracle_2.6.3.979_Freeware.msi, /mnt/share/Share/Xfer/R1, 43.14 MB, 12/2/2014 3:27:19 PM, 51 secs, 866.17 KB/sec
+12/2/2014 3:26:32 PM, C:\DropFolder\DellCodeTesterOracle_2.6.3.979.msi, /mnt/share/Share/Xfer/R1, 43.14 MB, 12/2/2014 3:27:48 PM, 16 secs, 2.7 MB/sec
+12/2/2014 3:35:43 PM, C:\DropFolder\QuestSQLOptimizerForOracle_8_9_1_3174_32bit.msi, /mnt/share/Share/Xfer/R1, 77.16 MB, 12/2/2014 3:37:59 PM, 15 secs, 5.14 MB/sec
+12/2/2014 3:35:38 PM, C:\DropFolder\ToadforMySQL_Freeware_7.3.0.3145.msi, /mnt/share/Share/Xfer/R1, 79.64 MB, 12/2/2014 3:38:21 PM, 43 secs, 1.85 MB/sec
+12/2/2014 3:35:13 PM, C:\DropFolder\QuestSQLOptimizerForOracle_8_9_1_3174_Trial_32bit.msi, /mnt/share/Share/Xfer/R1, 77.09 MB, 12/2/2014 3:38:30 PM, 16 secs, 4.82 MB/sec
+12/2/2014 3:35:03 PM, C:\DropFolder\QuestSQLOptimizerForOracle_8_9_1_3174_64bit.msi, /mnt/share/Share/Xfer/R1, 84.54 MB, 12/2/2014 3:38:47 PM, 43 secs, 1.97 MB/sec
+12/2/2014 3:35:18 PM, C:\DropFolder\QuestSQLOptimizerForOracle_8_9_1_3174_Trial_64bit.msi, /mnt/share/Share/Xfer/R1, 84.45 MB, 12/2/2014 3:38:50 PM, 32 secs, 2.64 MB/sec
+12/2/2014 3:35:28 PM, C:\DropFolder\ToadDataModeler_5.3.4.3.msi, /mnt/share/Share/Xfer/R1, 109.62 MB, 12/2/2014 3:39:50 PM, 21 secs, 5.22 MB/sec
+12/2/2014 3:46:34 PM, C:\DropFolder\BackupReporter_2.0.0.14.msi, /mnt/share/Share/Xfer/R1, 55.98 MB, 12/2/2014 3:46:45 PM, 10 secs, 5.6 MB/sec
+12/2/2014 9:58:37 PM, C:\DropFolder\BackupReporter_2.0.0.14.msi, /mnt/share/Share/Xfer/R1, 55.98 MB, 12/2/2014 9:58:47 PM, 10 secs, 5.6 MB/sec, ALVTLY
+12/2/2014 9:58:27 PM, C:\DropFolder\BenchmarkFactory_7_1_0_496_Trial_32bit.msi, /mnt/share/Share/Xfer/R1, 87.82 MB, 12/2/2014 10:04:41 PM, 14 secs, 6.27 MB/sec, ALVTLY
+12/2/2014 9:58:57 PM, C:\DropFolder\BenchmarkFactory_7_1_0_496_32bit.msi, /mnt/share/Share/Xfer/R1, 87.82 MB, 12/2/2014 10:05:15 PM, 18 secs, 4.88 MB/sec, ALVTLY
+12/2/2014 9:59:37 PM, C:\DropFolder\BenchmarkFactory_7_1_0_496_64bit.msi, /mnt/share/Share/Xfer/R1, 100.45 MB, 12/2/2014 10:06:05 PM, 28 secs, 3.59 MB/sec, ALVTLY

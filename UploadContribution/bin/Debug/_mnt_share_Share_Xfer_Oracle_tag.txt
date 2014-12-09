@@ -1,0 +1,5 @@
+12/8/2014 12:16:53 PM, C:\DropFolder\Oracle\BackupReporter_2.0.0.14.msi, /mnt/share/Share/Xfer/Oracle/Backup_Reporter/BackupReporter_2.0.0.14.msi, 55.98 MB, 12/8/2014 12:17:06 PM, 13 secs, 4.31 MB/sec, ALVTLY
+12/8/2014 12:18:48 PM, C:\DropFolder\Oracle\BenchmarkFactory_7_1_0_496_32bit.msi, /mnt/share/Share/Xfer/Oracle/Benchmark_Factory/BenchmarkFactory_7_1_0_496_32bit.msi, 87.82 MB, 12/8/2014 12:21:28 PM, 160 secs, 562.02 KB/sec, ALVTLY
+12/8/2014 12:19:23 PM, C:\DropFolder\Oracle\BenchmarkFactory_7_1_0_496_Trial_64bit.msi, /mnt/share/Share/Xfer/Oracle/Benchmark_Factory_Trial_64/BenchmarkFactory_7_1_0_496_Trial_64bit.msi, 100.48 MB, 12/8/2014 12:23:18 PM, 235 secs, 437.84 KB/sec, ALVTLY
+12/8/2014 12:20:28 PM, C:\DropFolder\Oracle\ToadDataModeler_5.3.4.13.msi, /mnt/share/Share/Xfer/Oracle/Toad_Data_Modeler/ToadDataModeler_5.3.4.13.msi, 113.69 MB, 12/8/2014 12:24:34 PM, 246 secs, 473.24 KB/sec, ALVTLY
+12/8/2014 12:22:48 PM, C:\DropFolder\Oracle\Dell Toad for Oracle 12.6 64bit.msi, /mnt/share/Share/Xfer/Oracle/Toad_Standalone_64/Dell Toad for Oracle 12.6 64bit.msi, 95.37 MB, 12/8/2014 12:26:00 PM, 191 secs, 511.3 KB/sec, ALVTLY

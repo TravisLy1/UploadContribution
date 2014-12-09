@@ -1,0 +1,1 @@
+rsync -vrz -hh --stats --protect-args --progress -e "/cygdrive/c/dev/UploadContribution/UploadContribution/bin/Debug/ssh -i /cygdrive/c/dev/UploadContribution/UploadContribution/bin/Debug/rsynckey" "/cygdrive/c/DropFolder/Oracle/BackupReporter_2.0.0.14.msi" suite@fileserver.skytapbuilddb.local:"/mnt/share/Share/Xfer/Oracle/Backup_Reporter/BackupReporter_2.0.0.14.msi" 

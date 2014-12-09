@@ -1,0 +1,9 @@
+C:\dev\UploadContribution\UploadContribution\bin\Debug\UploadContribution.exe.config
+C:\dev\UploadContribution\UploadContribution\bin\Debug\UploadContribution.exe
+C:\dev\UploadContribution\UploadContribution\bin\Debug\UploadContribution.pdb
+C:\dev\UploadContribution\UploadContribution\obj\Debug\UploadContribution.Properties.Resources.resources
+C:\dev\UploadContribution\UploadContribution\obj\Debug\UploadContribution.csproj.GenerateResource.Cache
+C:\dev\UploadContribution\UploadContribution\obj\Debug\UploadContribution.exe
+C:\dev\UploadContribution\UploadContribution\obj\Debug\UploadContribution.pdb
+C:\dev\UploadContribution\UploadContribution\obj\Debug\UploadContribution.FormMain.resources
+C:\dev\UploadContribution\UploadContribution\obj\Debug\UploadContribution.csprojResolveAssemblyReference.cache

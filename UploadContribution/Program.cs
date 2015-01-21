@@ -20,17 +20,22 @@ namespace UploadContribution
         public static string WorkingDir;
         public static string TransferLog;
         public static int TransferMaxRetries;
+        public static string RsyncResult;
+        private static UploadContribution.Properties.Settings m_settings;
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
         static void Main(string[] args)
         {
+           
             // Get loginInfo from Applicaiton Setitings
-            UploadContribution.Properties.Settings s = new UploadContribution.Properties.Settings();
-            s.Reload();
-            LoginInfo = s.LoginInfo;
-            TransferMaxRetries = s.TransferMaxRetries;
+            m_settings = new UploadContribution.Properties.Settings();
+            m_settings.Reload();
+            LoginInfo = m_settings.LoginInfo;
+            TransferMaxRetries = m_settings.TransferMaxRetries;
+            m_settings.Verbose = false;
 
             // arg0 - watch folder
             // arg1 - destination folder
@@ -91,37 +96,81 @@ namespace UploadContribution
         /// Create a temp file base on destination folder
         /// </summary>
         /// <returns></returns>
-        private static string GetTagFileName()
+        private static string GetTagFileName(string fileName)
         {
             string tmpFile = DestinationFolder.Replace('/', '_');
-            tmpFile = WorkingDir + "\\" + tmpFile + "_tag.txt";
+            tmpFile = WorkingDir + "\\" + tmpFile + "_" + fileName;
             return tmpFile;
         }
+
+        // make this verbose
         public static int GetTagFile()
         {
             string remotetagFile = Program.DestinationFolder + "/tag.txt";
-            string localTagFile = GetTagFileName();//WorkingDir + @"\tag.txt";
-
+            string localTagFile = GetTagFileName("tag.txt");//WorkingDir + @"\tag.txt";
+            m_settings.Verbose = true;
             if (RunRSync(Program.LoginInfo, remotetagFile, localTagFile, false) != 0)
             {
                 // may file does not exist, create and empty file, when sendTag is called
 
             }
+            m_settings.Verbose = false;
             return 0;      // download the file
         }
 
-
+        /// <summary>
+        /// Send the tag file,  Make this verbose
+        /// </summary>
+        /// <returns></returns>
         public static int SendTagFile()
         {
             string remotetagFile = Program.DestinationFolder + "/tag.txt";
-            string localTagFile = GetTagFileName();
+            string localTagFile = GetTagFileName("tag.txt");
             // Need to add to the file
             // Append the Transfer Log
             File.AppendAllText(localTagFile, TransferLog);
             // Clear out the String
             Program.TransferLog = "";
-            return RunRSync(Program.LoginInfo, localTagFile, remotetagFile, true);      // upload the file
+            m_settings.Verbose = true;
+            int status = RunRSync(Program.LoginInfo, localTagFile, remotetagFile, true);      // upload the file
+            m_settings.Verbose = false;
+            return status;
         }
+
+        /// <summary>
+        ///  download the latest build file from the server for update
+        ///  PackageNames.wxi is in the bundle folder 
+        /// </summary>
+        /// <returns> the full local filename</returns>
+        public static string GetBuildFile()
+        {            
+            string remoteFile = Program.DestinationFolder + "/PackageNames.wxi";
+            string localFile = GetTagFileName("PackageNames.wxi");//WorkingDir + @"\tag.txt";
+            m_settings.Verbose = true;
+            if (RunRSync(Program.LoginInfo, remoteFile, localFile, false) != 0)
+            {
+                // may file does not exist, create and empty file, when sendTag is called
+
+            }
+            m_settings.Verbose = false;           
+            return localFile;
+        }
+
+        /// <summary>
+        /// Save the build file back to the server
+        /// </summary>
+        /// <returns></returns>
+        public static int SendBuildFile()
+        {
+            string remoteFile = Program.DestinationFolder + "/PackageNames.wxi";
+            string localFile = GetTagFileName("PackageNames.wxi");
+            m_settings.Verbose = true;
+            int status = RunRSync(Program.LoginInfo, localFile, remoteFile, true);      // upload the file
+            m_settings.Verbose = false;
+            return status;
+        }
+    
+    
         /// <summary>
         /// Run the Rsync process.  
         /// </summary>
@@ -131,13 +180,16 @@ namespace UploadContribution
         /// string loginInfo = string.Format("rsyncjob@skytapbuilddb.com");
         public static int RunRSync(string loginInfo, string sourcePath, string destinationPath, bool upload)
         {
+            
             // Download
             // rsync -avz -e "ssh -i /cygdrive/c/sshKey/rsyncKey" rsyncjob@skytapbuilddb.com:/home/rsyncjob /tmp
 
             // Upload -remove-source-files (option)
             // rsync -avz  -r --progress -e "ssh -i /cygdrive/c/sshKey/rsyncKey" "/cygdrive/c/temp" "suite@fileserver.skytapbuilddb.local:/home/suite/temp2/"
             ProcessStartInfo info = new ProcessStartInfo("rsync.exe");
-
+            RsyncResult = "";
+            info.RedirectStandardOutput = m_settings.Verbose;
+            
             Uri uri = new Uri(Assembly.GetExecutingAssembly().CodeBase);
             info.WorkingDirectory = Path.GetDirectoryName(uri.LocalPath);
            
@@ -165,11 +217,16 @@ namespace UploadContribution
                                          sshInfo, loginInfo, sourcePath, destinationPath);
             }
 
+           
             info.WindowStyle = ProcessWindowStyle.Normal;
             info.UseShellExecute = false;
 
             Process process = Process.Start(info);
-            
+                     
+            if (info.RedirectStandardOutput)
+            {
+                RsyncResult = process.StandardOutput.ReadToEnd();
+            }
             process.WaitForExit();
             return process.ExitCode;
   

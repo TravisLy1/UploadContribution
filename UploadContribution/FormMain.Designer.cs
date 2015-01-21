@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.tsTestText = new System.Windows.Forms.ToolStripTextBox();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.tsLabelWatchFolder = new System.Windows.Forms.ToolStripLabel();
@@ -42,7 +43,6 @@
             this.openFileDlg = new System.Windows.Forms.OpenFileDialog();
             this.openFolderDlg = new System.Windows.Forms.FolderBrowserDialog();
             this.timerTransfer = new System.Windows.Forms.Timer(this.components);
-            this.tsTestText = new System.Windows.Forms.ToolStripTextBox();
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -56,6 +56,13 @@
             this.menuStrip1.Size = new System.Drawing.Size(678, 27);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
+            // 
+            // tsTestText
+            // 
+            this.tsTestText.Name = "tsTestText";
+            this.tsTestText.Size = new System.Drawing.Size(400, 23);
+            this.tsTestText.Text = "TestName";
+            this.tsTestText.TextChanged += new System.EventHandler(this.tsTestText_TextChanged);
             // 
             // toolStrip1
             // 
@@ -136,13 +143,6 @@
             this.timerTransfer.Enabled = true;
             this.timerTransfer.Interval = 5000;
             this.timerTransfer.Tick += new System.EventHandler(this.timerTransfer_Tick);
-            // 
-            // tsTestText
-            // 
-            this.tsTestText.Name = "tsTestText";
-            this.tsTestText.Size = new System.Drawing.Size(400, 23);
-            this.tsTestText.Text = "TestName";
-            this.tsTestText.TextChanged += new System.EventHandler(this.tsTestText_TextChanged);
             // 
             // FormMain
             // 

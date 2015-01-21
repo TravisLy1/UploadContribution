@@ -43,7 +43,7 @@ namespace UploadContribution.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("/mnt/share/Share/Xfer/R1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("/mnt/share/Share/Xfer/DSIBuild/Toad_for_Oracle_Installer/Bundle")]
         public string DestinationPath {
             get {
                 return ((string)(this["DestinationPath"]));
@@ -62,6 +62,18 @@ namespace UploadContribution.Properties {
             }
             set {
                 this["TransferMaxRetries"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool Verbose {
+            get {
+                return ((bool)(this["Verbose"]));
+            }
+            set {
+                this["Verbose"] = value;
             }
         }
     }

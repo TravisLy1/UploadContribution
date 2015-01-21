@@ -9,10 +9,13 @@
       <Value Profile="(Default)">c:\DropFolder</Value>
     </Setting>
     <Setting Name="DestinationPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">/mnt/share/Share/Xfer/R1</Value>
+      <Value Profile="(Default)">/mnt/share/Share/Xfer/DSIBuild/Toad_for_Oracle_Installer/Bundle</Value>
     </Setting>
     <Setting Name="TransferMaxRetries" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">3</Value>
+    </Setting>
+    <Setting Name="Verbose" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

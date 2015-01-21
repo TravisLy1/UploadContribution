@@ -20,25 +20,25 @@ namespace UploadContribution
         //private List<Task> m_tasks;
         private List<XferJobInfo> m_jobs;
         private List<XferJobInfo> m_jobQue;
+        private List<String> m_files;               // List of files to be added to build wxi
         private IFileNameMapping m_fileMapping;
 
         private FileSystemWatcher m_watcher;
         public FormMain()
         {
-
             InitializeComponent();
-            //m_tasks = new List<Task>();
+
             m_jobs = new List<XferJobInfo>();
             m_jobQue = new List<XferJobInfo>();
-            m_fileMapping = new FileNameMapping();
+            m_files = new List<string>();
+            m_fileMapping = new SimpleNameMapping(); // FileNameMapping();
 
             startWatching();
             updateStatus();
             tsLabelDestination.Text = Program.DestinationFolder;
             tsLabelWatchFolder.Text = Program.WatchFolder;
             m_machineName = Environment.MachineName;
-            this.Text = m_machineName;
-
+            this.Text = "Uploading Contribution -" + m_machineName;
        }
 
 
@@ -104,6 +104,8 @@ namespace UploadContribution
             if (xInfo.ReturnCode == 0)
             {
                 addLine(xInfo.Source + " transferred successfully", Color.DarkGreen);
+                // Add to list of files to be used for update build file
+                m_files.Add(m_fileMapping.CreateDestination(xInfo.Source));  
                 try
                 {
                      // Delete file if return code is 0 
@@ -121,13 +123,20 @@ namespace UploadContribution
                 // Complete transfer and nothing in the queue
                 if ((m_jobs.Count == 0) && (m_jobQue.Count == 0))
                 {
+
+                    // Now need to get the PackageNames.wxi
+
+                    // Process the file to add new Msi file into it
+
                     //get the tag file
-                    addLine("Getting Tag File", Color.DarkGray);
+                    addLine("Getting Tag File");
                     Program.GetTagFile();
+                    addLine(Program.RsyncResult);
 
                     // upload tag file
-                    addLine("Updating Tag File", Color.DarkGray);
+                    addLine("Updating Tag File");
                     Program.SendTagFile();          // Send Tag file
+                    addLine(Program.RsyncResult);
                 }
             }
             else
@@ -157,7 +166,12 @@ namespace UploadContribution
             updateStatus();
         }
 
-
+        /// <summary>
+        /// Open a file and catch the exception.
+        /// If the file is not ready to be opened, it's still being copied.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         private bool IsLocked(string fileName)
         {
             try
@@ -254,6 +268,7 @@ namespace UploadContribution
             
         }
 
+        
         /// <summary>
         /// timestamp the message and add to the textbox.
         /// To prevent runtime faults should the amount
@@ -298,10 +313,13 @@ namespace UploadContribution
             }
         }
       
+        
         private void tsTestText_TextChanged(object sender, EventArgs e)
         {
             // Convert the fileName
-            addLine(tsTestText.Text + " -> " + m_fileMapping.CreateDestination(tsTestText.Text));   
+             addLine(tsTestText.Text + " -> " + m_fileMapping.CreateDestination(tsTestText.Text));  
+ 
+            
         }
     }
 }

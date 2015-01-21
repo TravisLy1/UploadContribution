@@ -3,12 +3,53 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using System.Text.RegularExpressions;
 
 namespace UploadContribution
 {
     interface IFileNameMapping
     {
         string CreateDestination(string sourceName);
+    }
+
+
+    class SimpleNameMapping : IFileNameMapping
+    {
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        private string GetVesion(string path)
+        {
+            Match match = Regex.Match(path,@"\d+(\.\d+)+", RegexOptions.IgnoreCase);
+            if (match.Success)
+                return match.Groups[0].Value;
+            else
+                return null;
+        }
+
+        /// <summary>
+        /// Remove the version from the string and return the destination 
+        /// for example,  BackupReporter_2.0.0.14_x86_EN.msi  =>  BackupReporter_x86_EN
+        /// 
+        /// </summary>
+        /// <param name="sourceName"></param>
+        /// <returns></returns>
+        public string CreateDestination(string sourceName)
+        {
+            sourceName = Path.GetFileNameWithoutExtension(sourceName);
+            string destName = sourceName;
+            string version = GetVesion(sourceName);
+            if (!String.IsNullOrEmpty(version))
+            {
+                int loc = sourceName.IndexOf(version);
+                destName = sourceName.Remove(loc, version.Length + 1);  // 
+            }
+            return destName;
+        }
     }
     /// <summary>
     /// This class maps the source file name and create a corresponding Destination Path

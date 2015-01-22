@@ -56,6 +56,7 @@
             this.menuStrip1.Size = new System.Drawing.Size(678, 27);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
+            this.menuStrip1.Visible = false;
             // 
             // tsTestText
             // 
@@ -74,7 +75,7 @@
             this.tsTextTransferring,
             this.toolStripLabel2,
             this.tsLabelDestination});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 27);
+            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(678, 25);
             this.toolStrip1.TabIndex = 1;
@@ -94,7 +95,8 @@
             // tsTextTodos
             // 
             this.tsTextTodos.Name = "tsTextTodos";
-            this.tsTextTodos.Size = new System.Drawing.Size(50, 25);
+            this.tsTextTodos.ReadOnly = true;
+            this.tsTextTodos.Size = new System.Drawing.Size(20, 25);
             this.tsTextTodos.Text = "0";
             this.tsTextTodos.TextBoxTextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.tsTextTodos.ToolTipText = "number of files in queue";
@@ -108,7 +110,8 @@
             // tsTextTransferring
             // 
             this.tsTextTransferring.Name = "tsTextTransferring";
-            this.tsTextTransferring.Size = new System.Drawing.Size(50, 25);
+            this.tsTextTransferring.ReadOnly = true;
+            this.tsTextTransferring.Size = new System.Drawing.Size(20, 25);
             this.tsTextTransferring.Text = "0";
             this.tsTextTransferring.TextBoxTextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.tsTextTransferring.ToolTipText = "number of files in transfer";
@@ -128,9 +131,9 @@
             // m_textTrace
             // 
             this.m_textTrace.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.m_textTrace.Location = new System.Drawing.Point(0, 52);
+            this.m_textTrace.Location = new System.Drawing.Point(0, 25);
             this.m_textTrace.Name = "m_textTrace";
-            this.m_textTrace.Size = new System.Drawing.Size(678, 425);
+            this.m_textTrace.Size = new System.Drawing.Size(678, 452);
             this.m_textTrace.TabIndex = 2;
             this.m_textTrace.Text = "";
             // 

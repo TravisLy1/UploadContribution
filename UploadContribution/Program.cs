@@ -160,10 +160,9 @@ namespace UploadContribution
         /// Save the build file back to the server
         /// </summary>
         /// <returns></returns>
-        public static int SendBuildFile()
+        public static int SendBuildFile(string localFile)
         {
-            string remoteFile = Program.DestinationFolder + "/PackageNames.wxi";
-            string localFile = GetTagFileName("PackageNames.wxi");
+            string remoteFile = Program.DestinationFolder + "/PackageNames.wxi";          
             m_settings.Verbose = true;
             int status = RunRSync(Program.LoginInfo, localFile, remoteFile, true);      // upload the file
             m_settings.Verbose = false;

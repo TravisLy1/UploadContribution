@@ -20,7 +20,7 @@ namespace UploadContribution
         //private List<Task> m_tasks;
         private List<XferJobInfo> m_jobs;
         private List<XferJobInfo> m_jobQue;
-        private List<String> m_files;               // List of files to be added to build wxi
+        private Dictionary<String, String> m_files;               // List of files to be added to build wxi
         private IFileNameMapping m_fileMapping;
 
         private FileSystemWatcher m_watcher;
@@ -30,7 +30,7 @@ namespace UploadContribution
 
             m_jobs = new List<XferJobInfo>();
             m_jobQue = new List<XferJobInfo>();
-            m_files = new List<string>();
+            m_files = new Dictionary<String, String>();
             m_fileMapping = new SimpleNameMapping(); // FileNameMapping();
 
             startWatching();
@@ -51,7 +51,7 @@ namespace UploadContribution
         void m_watcher_Created(object sender, FileSystemEventArgs e)
         {                      
             // Create destination by decoding the source File Name           
-            string destPath = Program.DestinationFolder +  "/" +  m_fileMapping.CreateDestination(e.Name);
+            string destPath = Program.DestinationFolder +  "/Products/" +  m_fileMapping.CreateDestination(e.Name);
             
             // File may be started to created, but not completely copied
             XferJobInfo xInfo = new XferJobInfo(e.FullPath, destPath);
@@ -86,7 +86,52 @@ namespace UploadContribution
             updateStatus();
         }
 
-       
+        /// <summary>
+        /// Replace the value if the key match
+        ///  example   <?define ToadForOracle_x64_EN_Package_Define="ToadForOracle_12.6_x64_EN.msi"?>
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        private  string replaceValue(string s)
+        {
+            string replacement = s;
+            try
+            {
+                foreach (string key in m_files.Keys)
+                {
+                    if (s.Contains(key))
+                    {
+                        string oldValue = s.Split(new char[] { '"' })[1];
+                        replacement = s.Replace(oldValue, m_files[key]);
+                        m_files.Remove(key);        // Once replace it, remove it from the list
+                        break;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+            return replacement;
+        }
+        /// <summary>
+        /// Read the file and replace any matching key with new value
+        /// </summary>
+        /// <param name="path"></param>
+        private void updateBuildFile(string path)
+        {
+            // Open the file, read all lines
+            string[] readText = File.ReadAllLines(path, Encoding.UTF8);
+
+            for (int i = 0; i < readText.Length; i++)
+            {
+                if (m_files.Count == 0)
+                    break;
+                if (readText[i].Contains("?define"))
+                    readText[i] = replaceValue(readText[i]);
+            }
+            // overwrite the file
+            File.WriteAllLines(path, readText, Encoding.UTF8);
+        }
 
         /// <summary>
         /// Transfer completed, could be success or failure
@@ -105,7 +150,7 @@ namespace UploadContribution
             {
                 addLine(xInfo.Source + " transferred successfully", Color.DarkGreen);
                 // Add to list of files to be used for update build file
-                m_files.Add(m_fileMapping.CreateDestination(xInfo.Source));  
+                m_files.Add(m_fileMapping.CreateDestination(xInfo.Source), Path.GetFileName(xInfo.Source));  
                 try
                 {
                      // Delete file if return code is 0 
@@ -123,20 +168,34 @@ namespace UploadContribution
                 // Complete transfer and nothing in the queue
                 if ((m_jobs.Count == 0) && (m_jobQue.Count == 0))
                 {
-
                     // Now need to get the PackageNames.wxi
-
-                    // Process the file to add new Msi file into it
-
-                    //get the tag file
-                    addLine("Getting Tag File");
-                    Program.GetTagFile();
+                    addLine("Getting  Build File");
+                    string fileName = Program.GetBuildFile();
                     addLine(Program.RsyncResult);
+                    if (String.IsNullOrEmpty(fileName))
+                    {
+                        // raise some errors
+                        addLine("ERROR - Getting Build File.  Abort", Color.Red);
+                    }
+                    else
+                    {
+                        // Process the file to add new Msi file into it
+                        updateBuildFile(fileName);
+                        // Upload Build File
+                        addLine("Updating Build File");
+                        Program.SendBuildFile(fileName);
+                        addLine(Program.RsyncResult);
 
-                    // upload tag file
-                    addLine("Updating Tag File");
-                    Program.SendTagFile();          // Send Tag file
-                    addLine(Program.RsyncResult);
+                        //get the tag file
+                        addLine("Getting Tag File");
+                        Program.GetTagFile();
+                        addLine(Program.RsyncResult);
+
+                        // upload tag file
+                        addLine("Updating Tag File");
+                        Program.SendTagFile();          // Send Tag file
+                        addLine(Program.RsyncResult);
+                    }
                 }
             }
             else

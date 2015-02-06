@@ -206,7 +206,7 @@ namespace UploadContribution
             if (upload)
             {
                 sourcePath = GetCygPath(sourcePath);   // source is local
-                info.Arguments = string.Format("-vrz -hh --stats --protect-args --progress {0} \"{1}\" {2}:\"{3}\" ",
+                info.Arguments = string.Format("-vrz -hh --stats --protect-args --progress --perms --chmod=a+rwx {0} \"{1}\" {2}:\"{3}\" ",
                                          sshInfo, sourcePath, loginInfo, destinationPath);
             }
             else

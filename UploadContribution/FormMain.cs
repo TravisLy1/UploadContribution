@@ -9,6 +9,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Reflection;
 
 namespace UploadContribution
 {
@@ -38,7 +39,8 @@ namespace UploadContribution
             tsLabelDestination.Text = Program.DestinationFolder;
             tsLabelWatchFolder.Text = Program.WatchFolder;
             m_machineName = Environment.MachineName;
-            this.Text = "Uploading Contribution -" + m_machineName;
+            string ver = string.Format("{0} {1}", Assembly.GetExecutingAssembly().GetName().Name, Assembly.GetExecutingAssembly().GetName().Version);
+            this.Text =  ver + " - " + m_machineName;
        }
 
 

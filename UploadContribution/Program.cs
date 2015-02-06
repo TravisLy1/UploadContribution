@@ -29,7 +29,8 @@ namespace UploadContribution
         [STAThread]
         static void Main(string[] args)
         {
-           
+            
+
             // Get loginInfo from Applicaiton Setitings
             m_settings = new UploadContribution.Properties.Settings();
             m_settings.Reload();

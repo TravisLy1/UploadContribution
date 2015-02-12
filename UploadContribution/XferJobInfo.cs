@@ -147,6 +147,7 @@ namespace UploadContribution
 
             xInfo.StartTime = DateTime.Now;
             xInfo.ReturnCode = Program.RunRSync(loginInfo, sourcePath, destinationPath, upload);
+            xInfo.ConsoleOutput = Program.RsyncResult;
             xInfo.EndTime = DateTime.Now;
             xInfo.OnCompleted(xInfo);
            

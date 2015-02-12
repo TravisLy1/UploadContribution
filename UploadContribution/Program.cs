@@ -28,8 +28,7 @@ namespace UploadContribution
         /// </summary>
         [STAThread]
         static void Main(string[] args)
-        {
-            
+        {       
 
             // Get loginInfo from Applicaiton Setitings
             m_settings = new UploadContribution.Properties.Settings();
@@ -37,6 +36,11 @@ namespace UploadContribution
             LoginInfo = m_settings.LoginInfo;
             TransferMaxRetries = m_settings.TransferMaxRetries;
             m_settings.Verbose = false;
+            // Set up FTP attributes
+            FtpXfer.FtpServerName = m_settings.FtpServerName;
+            FtpXfer.FtpUser = m_settings.FtpUser;
+            FtpXfer.FtpPwd = m_settings.FtpPwd;
+            FtpXfer.HostFingerPrint = m_settings.HostFingerPrint;
 
             // arg0 - watch folder
             // arg1 - destination folder

@@ -17,5 +17,17 @@
     <Setting Name="Verbose" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="FtpServerName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">fileserver.skytapbuilddb.local</Value>
+    </Setting>
+    <Setting Name="FtpUser" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">suite</Value>
+    </Setting>
+    <Setting Name="FtpPwd" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">suite</Value>
+    </Setting>
+    <Setting Name="HostFingerPrint" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ssh-rsa 2048 d1:d6:8f:38:b3:4b:e0:c2:40:2f:f1:67:bd:eb:21:57</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

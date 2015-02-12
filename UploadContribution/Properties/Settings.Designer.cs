@@ -76,5 +76,41 @@ namespace UploadContribution.Properties {
                 this["Verbose"] = value;
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("fileserver.skytapbuilddb.local")]
+        public string FtpServerName {
+            get {
+                return ((string)(this["FtpServerName"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("suite")]
+        public string FtpUser {
+            get {
+                return ((string)(this["FtpUser"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("suite")]
+        public string FtpPwd {
+            get {
+                return ((string)(this["FtpPwd"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ssh-rsa 2048 d1:d6:8f:38:b3:4b:e0:c2:40:2f:f1:67:bd:eb:21:57")]
+        public string HostFingerPrint {
+            get {
+                return ((string)(this["HostFingerPrint"]));
+            }
+        }
     }
 }

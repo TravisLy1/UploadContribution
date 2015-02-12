@@ -79,6 +79,13 @@ namespace UploadContribution
                 if (!m_jobs.Contains(xInfo))
                     m_jobs.Add(xInfo);
             }
+
+            
+            // before transferring, need to look at the destination
+            FtpXfer ftp = new FtpXfer();
+            ftp.renameMSIFile(xInfo.Destination, Path.GetFileName(xInfo.Source));
+            addLine(ftp.LastStatus);
+
             addLine("Transfering: " + xInfo.Source + " to " + xInfo.Destination, Color.Blue);
             xInfo.OnCompleted += OnTransferCompleted;
            
@@ -150,6 +157,9 @@ namespace UploadContribution
 
             if (xInfo.ReturnCode == 0)
             {
+                if (!String.IsNullOrEmpty(xInfo.ConsoleOutput))
+                     addLine(xInfo.ConsoleOutput);
+
                 addLine(xInfo.Source + " transferred successfully", Color.DarkGreen);
                 // Add to list of files to be used for update build file
                 m_files.Add(m_fileMapping.CreateDestination(xInfo.Source), Path.GetFileName(xInfo.Source));  

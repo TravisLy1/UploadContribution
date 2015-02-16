@@ -29,8 +29,10 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.tsTestText = new System.Windows.Forms.ToolStripTextBox();
+            this.sendMailToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.tsLabelWatchFolder = new System.Windows.Forms.ToolStripLabel();
@@ -43,6 +45,7 @@
             this.openFileDlg = new System.Windows.Forms.OpenFileDialog();
             this.openFolderDlg = new System.Windows.Forms.FolderBrowserDialog();
             this.timerTransfer = new System.Windows.Forms.Timer(this.components);
+            this.getFolderListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -50,20 +53,29 @@
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.getFolderListToolStripMenuItem,
+            this.sendMailToolStripMenuItem,
             this.tsTestText});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(678, 27);
+            this.menuStrip1.Size = new System.Drawing.Size(678, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
-            this.menuStrip1.Visible = false;
             // 
             // tsTestText
             // 
             this.tsTestText.Name = "tsTestText";
             this.tsTestText.Size = new System.Drawing.Size(400, 23);
             this.tsTestText.Text = "TestName";
+            this.tsTestText.Visible = false;
             this.tsTestText.TextChanged += new System.EventHandler(this.tsTestText_TextChanged);
+            // 
+            // sendMailToolStripMenuItem
+            // 
+            this.sendMailToolStripMenuItem.Name = "sendMailToolStripMenuItem";
+            this.sendMailToolStripMenuItem.Size = new System.Drawing.Size(68, 20);
+            this.sendMailToolStripMenuItem.Text = "SendMail";
+            this.sendMailToolStripMenuItem.Click += new System.EventHandler(this.sendMailToolStripMenuItem_Click);
             // 
             // toolStrip1
             // 
@@ -75,7 +87,7 @@
             this.tsTextTransferring,
             this.toolStripLabel2,
             this.tsLabelDestination});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip1.Location = new System.Drawing.Point(0, 24);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(678, 25);
             this.toolStrip1.TabIndex = 1;
@@ -131,9 +143,9 @@
             // m_textTrace
             // 
             this.m_textTrace.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.m_textTrace.Location = new System.Drawing.Point(0, 25);
+            this.m_textTrace.Location = new System.Drawing.Point(0, 49);
             this.m_textTrace.Name = "m_textTrace";
-            this.m_textTrace.Size = new System.Drawing.Size(678, 452);
+            this.m_textTrace.Size = new System.Drawing.Size(678, 428);
             this.m_textTrace.TabIndex = 2;
             this.m_textTrace.Text = "";
             // 
@@ -147,6 +159,14 @@
             this.timerTransfer.Interval = 5000;
             this.timerTransfer.Tick += new System.EventHandler(this.timerTransfer_Tick);
             // 
+            // getFolderListToolStripMenuItem
+            // 
+            this.getFolderListToolStripMenuItem.Name = "getFolderListToolStripMenuItem";
+            this.getFolderListToolStripMenuItem.Size = new System.Drawing.Size(158, 20);
+            this.getFolderListToolStripMenuItem.Text = "Update Remote Folder List";
+            this.getFolderListToolStripMenuItem.ToolTipText = "Get Remote Folder List";
+            this.getFolderListToolStripMenuItem.Click += new System.EventHandler(this.getFolderListToolStripMenuItem_Click);
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -155,6 +175,7 @@
             this.Controls.Add(this.m_textTrace);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.menuStrip1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FormMain";
             this.Text = "Form1";
             this.menuStrip1.ResumeLayout(false);
@@ -182,5 +203,7 @@
         private System.Windows.Forms.ToolStripLabel toolStripLabel2;
         private System.Windows.Forms.ToolStripLabel tsLabelDestination;
         private System.Windows.Forms.ToolStripTextBox tsTestText;
+        private System.Windows.Forms.ToolStripMenuItem sendMailToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem getFolderListToolStripMenuItem;
     }
 }

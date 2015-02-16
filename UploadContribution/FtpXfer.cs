@@ -46,6 +46,42 @@ namespace UploadContribution
             set { lastStatus = value; }
         }
 
+        public List<String> GetFolderList(string folderPath)
+        {
+            List<String> folders = new List<string>();
+            SessionOptions sessionOptions = new SessionOptions
+            {
+                Protocol = Protocol.Sftp,
+                HostName = FtpServerName, //hostname e.g. IP: 192.54.23.32, or mysftpsite.com
+                UserName = FtpUser,
+                Password = FtpPwd,
+                SshHostKeyFingerprint = HostFingerPrint
+            };
+            try
+            {
+                using (Session session = new Session())
+                {
+                    session.Open(sessionOptions); //Attempts to connect to your sFtp site
+                    RemoteDirectoryInfo rdInfo = session.ListDirectory(folderPath);
+                    // Find the MSI File
+
+                    foreach (RemoteFileInfo rfInfo in rdInfo.Files)
+                    {
+                        if (rfInfo.IsDirectory)
+                        {
+                            // Don't add . and ..
+                            if ((rfInfo.Name !=".") && (rfInfo.Name !=".."))
+                                folders.Add(rfInfo.Name);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LastStatus = ex.Message;
+            }
+            return folders;
+        }
         /// <summary>
         /// Find the MSI file and rename it to the new file so 
         /// </summary>

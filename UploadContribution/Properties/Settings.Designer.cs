@@ -112,5 +112,17 @@ namespace UploadContribution.Properties {
                 return ((string)(this["HostFingerPrint"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("relay.prod.quest.corp")]
+        public string MailServer {
+            get {
+                return ((string)(this["MailServer"]));
+            }
+            set {
+                this["MailServer"] = value;
+            }
+        }
     }
 }

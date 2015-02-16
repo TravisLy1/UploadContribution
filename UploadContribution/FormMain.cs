@@ -5,11 +5,15 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.IO;
+using System.Security.AccessControl;
 
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Reflection;
+using System.Net;
+using System.Net.Mail;
+using System.DirectoryServices;
 
 namespace UploadContribution
 {
@@ -22,7 +26,7 @@ namespace UploadContribution
         private List<XferJobInfo> m_jobs;
         private List<XferJobInfo> m_jobQue;
         private Dictionary<String, String> m_files;               // List of files to be added to build wxi
-        private IFileNameMapping m_fileMapping;
+        
 
         private FileSystemWatcher m_watcher;
         public FormMain()
@@ -32,8 +36,7 @@ namespace UploadContribution
             m_jobs = new List<XferJobInfo>();
             m_jobQue = new List<XferJobInfo>();
             m_files = new Dictionary<String, String>();
-            m_fileMapping = new SimpleNameMapping(); // FileNameMapping();
-
+ 
             startWatching();
             updateStatus();
             tsLabelDestination.Text = Program.DestinationFolder;
@@ -41,8 +44,42 @@ namespace UploadContribution
             m_machineName = Environment.MachineName;
             string ver = string.Format("{0} {1}", Assembly.GetExecutingAssembly().GetName().Name, Assembly.GetExecutingAssembly().GetName().Version);
             this.Text =  ver + " - " + m_machineName;
+
+            // Refresh the folder list
+            // if mail is turned off, bail out
+            getFolderListToolStripMenuItem_Click(null, new EventArgs());
        }
 
+        /// <summary>
+        /// Validate the name
+        /// </summary>
+        /// <param name="xInfo"></param>
+        /// <returns></returns>
+        private bool ValidateFileNamingConvention(XferJobInfo xInfo)
+        {
+            string destinationFolder = FileNameMapping.CreateDestination(xInfo.Source);
+            string validateFolder = FileNameMapping.VerifyDestinationPath(destinationFolder);
+            string ownerEmail = FindOwnerEmail(Path.GetFullPath(xInfo.Source));
+            // Check the name of the file against the list of remote folders
+            // Findout the owner of the file
+            // Get the email address of the owner
+            if (String.IsNullOrEmpty(validateFolder))
+            {
+                // send an error email
+                string body = "Invalid Destination Path: " + destinationFolder + "\n\r";
+                body += "FileName = " + xInfo.Source;
+
+                string subject = "UploadContribution ERROR";
+                if (String.IsNullOrEmpty(ownerEmail))
+                    PostErrorLog("ERROR", body, xInfo.Source);
+                else
+                    SendMail(subject, body, ownerEmail);
+                addLine("ERROR: " + body, Color.Red);
+                return false;
+            }
+            else
+                return true;
+        }
 
     
         /// <summary>
@@ -51,48 +88,89 @@ namespace UploadContribution
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void m_watcher_Created(object sender, FileSystemEventArgs e)
-        {                      
-            // Create destination by decoding the source File Name           
-            string destPath = Program.DestinationFolder +  "/Products/" +  m_fileMapping.CreateDestination(e.Name);
-            
-            // File may be started to created, but not completely copied
-            XferJobInfo xInfo = new XferJobInfo(e.FullPath, destPath);
-            lock (m_jobQue)
+        {
+            if (Path.GetExtension(e.Name) == ".log")
+                return;
+
+            string destinationFolder =  FileNameMapping.CreateDestination(e.Name);
+            string validateFolder = FileNameMapping.VerifyDestinationPath(destinationFolder);
+
+            string ownerEmail =  FindOwnerEmail(Path.GetFullPath(e.FullPath));
+            // Check the name of the file against the list of remote folders
+            // Findout the owner of the file
+            // Get the email address of the owner
+            if (String.IsNullOrEmpty(validateFolder))
             {
-                m_jobQue.Add(xInfo);
+                // send an error email
+                string body = "Invalid Destination Path: " + destinationFolder + "\n\r" + ".  FileName = " + e.Name;
+
+                ownerEmail = FindOwnerEmail(Path.GetFullPath(e.FullPath));
+                string subject = "UploadContribution ERROR";
+                if (String.IsNullOrEmpty(ownerEmail))
+                    PostErrorLog(subject, body, e.FullPath);
+                else
+                    SendMail(subject, body, ownerEmail);
+                addLine("ERROR: " + body, Color.Red);
             }
-            addLine("Add to Queue: " + e.FullPath, Color.DarkBlue);
-            updateStatus();
+            else
+            {
+                // Create destination by decoding the source File Name           
+                string destPath = Program.DestinationFolder + "/Products/" + validateFolder;
+
+                // File may be started to created, but not completely copied
+                XferJobInfo xInfo = new XferJobInfo(e.FullPath, destPath);
+                xInfo.OwnerEmail = ownerEmail;          // save for later
+                lock (m_jobQue)
+                {
+                    if (m_jobQue.Find(x => x.Source == xInfo.Source) == null)
+                        m_jobQue.Add(xInfo);
+                }
+                addLine("Add to Queue: " + e.FullPath, Color.DarkBlue);
                
-            timerTransfer.Interval = 5000;
-            timerTransfer.Start();
+                timerTransfer.Interval = 5000;
+                timerTransfer.Start();
+            }
+            updateStatus();
         }
 
-
+        /// <summary>
+        /// Actual Transfer method, threaded
+        /// </summary>
+        /// <param name="xInfo"></param>
         private void doTransfer(XferJobInfo xInfo)
         {
             if (IsLocked(xInfo.Source) )
                 return;          // File is lockec cannot transfer
-            lock (this)
-            {
-                m_jobQue.Remove(xInfo);   // Move from Que to Jobs
-                if (!m_jobs.Contains(xInfo))
-                    m_jobs.Add(xInfo);
-            }
-
-            
-            // before transferring, need to look at the destination
-            FtpXfer ftp = new FtpXfer();
-            ftp.renameMSIFile(xInfo.Destination, Path.GetFileName(xInfo.Source));
-            addLine(ftp.LastStatus);
-
-            addLine("Transfering: " + xInfo.Source + " to " + xInfo.Destination, Color.Blue);
-            xInfo.OnCompleted += OnTransferCompleted;
            
-            Action doUpload = () => XferJobInfo.XferFile(xInfo);
-            Task t = new Task(doUpload);
-            t.Start();
-            updateStatus();
+            lock(m_jobQue)
+                m_jobQue.Remove(xInfo);   // Move from Que to Jobs
+            if (File.Exists(xInfo.Source))
+            {
+                if (!m_jobs.Contains(xInfo))
+                        m_jobs.Add(xInfo);
+                // before transferring, need to look at the destination
+                if (Path.GetExtension(xInfo.Source) == ".msi")
+                {
+                    FtpXfer ftp = new FtpXfer();
+                    ftp.renameMSIFile(xInfo.Destination, Path.GetFileName(xInfo.Source));
+                    addLine(ftp.LastStatus);
+                }
+                addLine("Transfering: " + xInfo.Source + " to " + xInfo.Destination, Color.Blue);
+                xInfo.OnCompleted += OnTransferCompleted;
+
+                Action doUpload = () => XferJobInfo.XferFile(xInfo);
+                Task t = new Task(doUpload);
+                t.Start();
+                updateStatus();
+            }
+            else
+            {
+                // Something happened,  Abort transfer
+                addLine(xInfo.Source + " does not exist");
+                return;
+            }
+            
+            
         }
 
         /// <summary>
@@ -133,13 +211,23 @@ namespace UploadContribution
 
             for (int i = 0; i < readText.Length; i++)
             {
-                if (m_files.Count == 0)
-                    break;
                 if (readText[i].Contains("?define"))
                     readText[i] = replaceValue(readText[i]);
+                // replaceValue remove items from m_files.
+                if (m_files.Count == 0)
+                    break;
             }
             // overwrite the file
             File.WriteAllLines(path, readText, Encoding.UTF8);
+        }
+
+        /// <summary>
+        /// Read the content of the remote folers 
+        /// </summary>
+        /// <param name="path"></param>
+        private void updateValidFolders(string path)
+        {
+
         }
 
         /// <summary>
@@ -160,9 +248,22 @@ namespace UploadContribution
                 if (!String.IsNullOrEmpty(xInfo.ConsoleOutput))
                      addLine(xInfo.ConsoleOutput);
 
-                addLine(xInfo.Source + " transferred successfully", Color.DarkGreen);
-                // Add to list of files to be used for update build file
-                m_files.Add(m_fileMapping.CreateDestination(xInfo.Source), Path.GetFileName(xInfo.Source));  
+                addLine(xInfo.Source + " uploaded successfully", Color.DarkGreen);
+                string body = "File " + xInfo.Source + " uploaded successfully!" + "\r\n";
+                body += Program.TransferLog;
+                SendMail("UploadContribution - File Uploaded Sucessfully", body, xInfo.OwnerEmail);
+                // Add to list of files to be used for update build file ONLY if it's an MSI file
+                string ext = Path.GetExtension(xInfo.Source);
+                if (!String.IsNullOrEmpty(ext) && (string.Compare(ext, ".msi", true) == 0))
+                {
+                    // keep track of the files to be added to the build file
+                    string destFolder = FileNameMapping.CreateDestination(xInfo.Source);
+                    destFolder = FileNameMapping.VerifyDestinationPath(destFolder);     // Get verified folder name
+                    if (!m_files.ContainsKey(destFolder))
+                        m_files.Add(destFolder, Path.GetFileName(xInfo.Source));
+                    else
+                        m_files[destFolder] = xInfo.Source;
+                }
                 try
                 {
                      // Delete file if return code is 0 
@@ -182,32 +283,9 @@ namespace UploadContribution
                 {
                     // Now need to get the PackageNames.wxi
                     addLine("Getting  Build File");
-                    string fileName = Program.GetBuildFile();
-                    addLine(Program.RsyncResult);
-                    if (String.IsNullOrEmpty(fileName))
-                    {
-                        // raise some errors
-                        addLine("ERROR - Getting Build File.  Abort", Color.Red);
-                    }
-                    else
-                    {
-                        // Process the file to add new Msi file into it
-                        updateBuildFile(fileName);
-                        // Upload Build File
-                        addLine("Updating Build File");
-                        Program.SendBuildFile(fileName);
-                        addLine(Program.RsyncResult);
-
-                        //get the tag file
-                        addLine("Getting Tag File");
-                        Program.GetTagFile();
-                        addLine(Program.RsyncResult);
-
-                        // upload tag file
-                        addLine("Updating Tag File");
-                        Program.SendTagFile();          // Send Tag file
-                        addLine(Program.RsyncResult);
-                    }
+                    if (m_files.Count > 0)              /// optionally update the remote BUild file
+                        UpdateRemoteBuildFile();
+                    UpdateRemoteTagFile();
                 }
             }
             else
@@ -216,7 +294,7 @@ namespace UploadContribution
                 addLine(xInfo.Source + " Failed to upload", Color.Red);
                 // Add back to todos
                 //m_todoFiles.Add(xInfo.Source);
-                if (xInfo.RetryCount < Program.TransferMaxRetries)
+                if (xInfo.RetryCount < Program.Settings.TransferMaxRetries)
                 {
                     lock (m_jobQue)
                     {
@@ -231,10 +309,64 @@ namespace UploadContribution
                 {
                     addLine("Retries Exceeded on " + xInfo.Source);
                 }
-            }
-
-            
+            }          
             updateStatus();
+        }
+
+        
+        private void UpdateRemoteBuildFile()
+        {
+            try
+            {
+                string fileName = Program.GetBuildFile();
+                addLine(Program.RsyncResult);
+                if (String.IsNullOrEmpty(fileName))
+                {
+                    // raise some errors
+                    addLine("ERROR - Getting Build File.  Abort", Color.Red);
+                }
+                else
+                {
+                    // Process the file to add new Msi file into it
+                    updateBuildFile(fileName);
+                    // Upload Build File
+                    addLine("Updating Build File");
+                    Program.SendBuildFile(fileName);
+                    addLine(Program.RsyncResult);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                addLine("Error UpdateRemoteBuildFile. " + ex.Message, Color.Red);
+            }
+        }
+        /// <summary>
+        /// Retrieve the tag file, add some info and upload it to trigger a new build
+        /// </summary>
+        private void UpdateRemoteTagFile()
+        {
+            //get the tag file
+            addLine("Getting Tag File");
+            try
+            {
+                if (Program.GetTagFile() != 0)
+                {
+                    addLine("ERROR - Getting Tag File", Color.Red);
+                }
+                else
+                {
+                    addLine(Program.RsyncResult);
+
+                    // upload tag file
+                    addLine("Updating Tag File");
+                    Program.SendTagFile();          // Send Tag file
+                    addLine(Program.RsyncResult);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                addLine("Error UpdateRemoteTagFile. " + ex.Message, Color.Red);
+            }
         }
 
         /// <summary>
@@ -253,7 +385,17 @@ namespace UploadContribution
             }
             catch
             {
-                return true;
+                if (File.Exists(fileName))
+                {
+                    return true;
+                }
+                else
+                {
+                    // Need to remove from Queue
+                    addLine("File " + fileName + " is missing!");
+                    return false;
+                }
+
             }
         }
 
@@ -388,9 +530,144 @@ namespace UploadContribution
         private void tsTestText_TextChanged(object sender, EventArgs e)
         {
             // Convert the fileName
-             addLine(tsTestText.Text + " -> " + m_fileMapping.CreateDestination(tsTestText.Text));  
- 
-            
+            addLine(tsTestText.Text + " -> " + FileNameMapping.CreateDestination(tsTestText.Text));
         }
+
+        private void sendMailToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Find the owner information
+            System.Security.AccessControl.FileSecurity fs = File.GetAccessControl(@"C:\tag.txt");
+            string user = fs.GetOwner(typeof(System.Security.Principal.NTAccount)).ToString();
+            addLine("Owner is " + user);
+            // Partse the username
+            if (user.Contains('\\'))
+            {
+                int loc = user.LastIndexOf('\\');
+                user = user.Substring(loc+1);
+            }
+            DirectoryEntry entry = new DirectoryEntry("LDAP://PROD");
+            DirectorySearcher searcher = new DirectorySearcher(entry);
+
+            searcher.Filter = "(&(objectClass=user)(samAccountName=" + user + "))";
+
+            SearchResult sr = searcher.FindOne();
+
+            if (sr != null)
+            {
+                ResultPropertyValueCollection rpc = sr.Properties["mail"];
+                if (rpc != null && rpc.Count > 0) 
+                {
+                    string sendTo =  rpc[0].ToString();
+                    SendMail("Testng", "Test Body", sendTo);
+                }
+            }
+         }
+
+        /// <summary>
+        /// Find the owner's email 
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        private string FindOwnerEmail(string fileName)
+        {
+            string emailAddr="";
+            try
+            {
+                // Find the owner information
+                System.Security.AccessControl.FileSecurity fs = File.GetAccessControl(fileName);
+                string user = fs.GetOwner(typeof(System.Security.Principal.NTAccount)).ToString();
+                //addLine("Owner is " + user);
+                // Partse the username
+                if (user.Contains('\\'))
+                {
+                    int loc = user.LastIndexOf('\\');
+                    if (loc > 0) user = user.Substring(loc + 1);
+                }
+
+                DirectoryEntry entry = new DirectoryEntry("LDAP://PROD");
+                DirectorySearcher searcher = new DirectorySearcher(entry);
+                searcher.Filter = "(&(objectClass=user)(samAccountName=" + user + "))";
+
+                SearchResult sr = searcher.FindOne();
+
+                if (sr != null)
+                {
+                    ResultPropertyValueCollection rpc = sr.Properties["mail"];
+                    if (rpc != null && rpc.Count > 0)
+                    {
+                        emailAddr = rpc[0].ToString();
+                    }
+                }
+            }
+            catch (System.Exception)
+            {
+
+            }
+            
+            return emailAddr;           
+        }
+
+
+        private void PostErrorLog(string subject, string body, string FileName)
+        {
+            string logFileName = Path.GetFullPath(FileName) + ".log";
+            string stuff = subject + "\r\n" + body;
+            File.AppendAllText(logFileName, stuff);
+        }
+        /// <summary>
+        /// Send email for notificaiton of success or failure when the user drops the file to the contribution folder
+        /// </summary>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
+        /// <param name="sendTo"></param>
+        private void SendMail(string subject, string body, string sendTo)
+        {
+            string from = "travis.ly@gmail.com";
+          
+            try
+            {
+                // MailMessage is used to represent the e-mail being sent
+                using (MailMessage message = new MailMessage())
+                {
+                    message.From = new MailAddress(from);
+                    message.Subject = subject;
+                    message.Body = body;
+               
+                    if (!String.IsNullOrEmpty(sendTo))
+                        message.To.Add(new MailAddress(sendTo));
+                    message.To.Add(new MailAddress(from));
+                                        // SmtpClient is used to send the e-mail
+                    SmtpClient mailClient = new SmtpClient(Program.Settings.MailServer);
+                    mailClient.EnableSsl = false;
+                    //mailClient.Credentials = new NetworkCredential("irvSwTest", "swTest");
+                    // UseDefaultCredentials tells the mail client to use the 
+                    // Windows credentials of the account (i.e. user account) 
+                    // being used to run the application
+                    mailClient.UseDefaultCredentials = true;
+                    mailClient.DeliveryMethod = SmtpDeliveryMethod.Network;
+
+                    // Send delivers the message to the mail server
+                    mailClient.Send(message);
+                }
+            }
+            catch (FormatException ex)
+            {
+                //throw new System.Exception("SendMail Failed", ex);
+                addLine("SendMail Failed: " + ex.Message);
+            }
+            catch (SmtpException ex)
+            {
+                //throw new System.Exception("SendMail Failed", ex);
+                addLine("SendMail Failed: " + ex.Message);
+            }
+        }
+
+        private void getFolderListToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FtpXfer ftp = new FtpXfer();
+            string destPath = Program.DestinationFolder + "/Products/";
+            FileNameMapping.FolderList = ftp.GetFolderList(destPath);
+        }        
+
     }
 }

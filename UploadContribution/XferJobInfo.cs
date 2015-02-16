@@ -85,6 +85,14 @@ namespace UploadContribution
             set { retryCount = value; }
         }
 
+        private string ownerEmail;
+
+        public string OwnerEmail
+        {
+            get { return ownerEmail; }
+            set { ownerEmail = value; }
+        }
+
         private string GetFileSize(double byteCount)
         {
             string size = "0 Bytes";
@@ -140,7 +148,7 @@ namespace UploadContribution
        
         public static void XferFile(XferJobInfo xInfo)
         {
-            string loginInfo = Program.LoginInfo;
+            string loginInfo = Program.Settings.LoginInfo;
             string sourcePath = xInfo.Source;
             string destinationPath = xInfo.Destination;
             bool upload = xInfo.Upload;

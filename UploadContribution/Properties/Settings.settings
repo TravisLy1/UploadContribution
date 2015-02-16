@@ -29,5 +29,8 @@
     <Setting Name="HostFingerPrint" Type="System.String" Scope="Application">
       <Value Profile="(Default)">ssh-rsa 2048 d1:d6:8f:38:b3:4b:e0:c2:40:2f:f1:67:bd:eb:21:57</Value>
     </Setting>
+    <Setting Name="MailServer" Type="System.String" Scope="User">
+      <Value Profile="(Default)">relay.prod.quest.corp</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

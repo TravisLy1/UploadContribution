@@ -8,21 +8,42 @@ using System.Text.RegularExpressions;
 
 namespace UploadContribution
 {
-    interface IFileNameMapping
-    {
-        string CreateDestination(string sourceName);
-    }
+    //class NoVersionNameMapping : IFileNameMapping
+    //{
+    //    /// <summary>
+    //    /// Non MSI file has no version and also has the last as the filename 
+    //    /// for example, BackupReporter_x86_EN_ProductDescription    BackupReporter_x86_EN
+    //    /// 
+    //    /// </summary>
+    //    /// <param name="sourceName"></param>
+    //    /// <returns></returns>
+    //    public string CreateDestination(string sourceName)
+    //    {
+    //        sourceName = Path.GetFileNameWithoutExtension(sourceName);
+    //        string destName = sourceName;
+
+    //        int pos = destName.LastIndexOf("_");
+    //        destName = destName.Substring(0, pos);
 
 
-    class SimpleNameMapping : IFileNameMapping
+    //        //string[] parts = destName.Split('_');
+    //        //parts = parts.Reverse().Skip(1).ToArray();
+    //        //parts = parts.Reverse().ToArray();
+    //        //// remove the last one
+    //        //destName = string.Join("_", parts);
+    //        return destName;
+    //    }
+    //}
+
+    class FileNameMapping 
     {
-        
+        public static List<string> FolderList = new List<string>();
         /// <summary>
         /// 
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        private string GetVesion(string path)
+        private static string GetVesion(string path)
         {
             Match match = Regex.Match(path,@"\d+(\.\d+)+", RegexOptions.IgnoreCase);
             if (match.Success)
@@ -38,7 +59,7 @@ namespace UploadContribution
         /// </summary>
         /// <param name="sourceName"></param>
         /// <returns></returns>
-        public string CreateDestination(string sourceName)
+        public static string CreateDestination(string sourceName)
         {
             sourceName = Path.GetFileNameWithoutExtension(sourceName);
             string destName = sourceName;
@@ -48,48 +69,25 @@ namespace UploadContribution
                 int loc = sourceName.IndexOf(version);
                 destName = sourceName.Remove(loc, version.Length + 1);  // 
             }
-            return destName;
-        }
-    }
-    /// <summary>
-    /// This class maps the source file name and create a corresponding Destination Path
-    /// </summary>
-    class FileNameMapping: IFileNameMapping
-    {
-        private List<ProductTag> _tagList;
-
-        public FileNameMapping()
-        {
-            _tagList = new List<ProductTag>();
-            _tagList.Add(new ProductTag("BackupReporter", "Backup_Reporter"));
-            _tagList.Add(new ProductTag("BenchmarkFactory", "Benchmark_Factory"));
-            _tagList.Add(new ProductTag("Spotlight on Oracle", "Performance_Diagnostics_(Spotlight_On_Oracle)", "x64"));
-            _tagList.Add(new ProductTag("QuestSQLOptimizerForOracle", "QuestSQLOptimizer_Oracle"));
-            _tagList.Add(new ProductTag("ToadDataModeler", "Toad_Data_Modeler"));
-            _tagList.Add(new ProductTag("DellCodeTester", "Quest_Code_Tester")); 
-            _tagList.Add(new ProductTag("ToadforSQLServer", "Toad_For_MSSQL"));
-            _tagList.Add(new ProductTag("ToadforMySQL_Freeware", "Toad_For_MySQL_Freeware"));
-            _tagList.Add(new ProductTagToad("Dell Toad for Oracle", "Toad"));
-        }
-               
-        // input =  BenchmarkFactory_7_1_0_496_32bit.msi
-        // output is a folder Benchnark_Factory 
-        public string CreateDestination(string sourceName)
-        {
-            string destName = sourceName;
-            string productTagfromName = ProductTag.GetMainTag(sourceName);      // get the product tag, ignore numbers 
-
-            // loop thru the list to see if any match
-            foreach (ProductTag p in _tagList)
+            else
             {
-                if (productTagfromName.StartsWith(p.Key))
-                {
-                    // found the main part matches
-                    destName = p.GetResultValue(sourceName) + "/" + sourceName;
-                    break;
-                }
+                int pos = destName.LastIndexOf("_");
+                destName = destName.Substring(0, pos);
             }
             return destName;
         }
+
+        /// <summary>
+        /// Verify against the known list of remote folders
+        /// </summary>
+        /// <param name="destPath"></param>
+        /// <returns></returns>
+        public static string VerifyDestinationPath(string destPath)
+        {
+            return FolderList.Find(x => String.Compare(x, destPath, true) == 0 );
+        }
     }
+
+    
+   
 }

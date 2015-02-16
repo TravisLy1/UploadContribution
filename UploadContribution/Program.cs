@@ -13,15 +13,21 @@ namespace UploadContribution
 {
     static class Program
     {
-        public static string LoginInfo;
+       // public static string LoginInfo;
         public static string WatchFolder;
         public static string DestinationFolder;
         public static string ProductFamily;
         public static string WorkingDir;
         public static string TransferLog;
-        public static int TransferMaxRetries;
+        //public static int TransferMaxRetries;
         public static string RsyncResult;
-        private static UploadContribution.Properties.Settings m_settings;
+        private static UploadContribution.Properties.Settings settings;
+
+        public static UploadContribution.Properties.Settings Settings
+        {
+            get { return Program.settings; }
+            set { Program.settings = value; }
+        }
 
         /// <summary>
         /// The main entry point for the application.
@@ -31,16 +37,16 @@ namespace UploadContribution
         {       
 
             // Get loginInfo from Applicaiton Setitings
-            m_settings = new UploadContribution.Properties.Settings();
-            m_settings.Reload();
-            LoginInfo = m_settings.LoginInfo;
-            TransferMaxRetries = m_settings.TransferMaxRetries;
-            m_settings.Verbose = false;
+            Settings = new UploadContribution.Properties.Settings();
+            Settings.Reload();
+            //LoginInfo = Settings.LoginInfo;
+            // = Settings.TransferMaxRetries;
+            Settings.Verbose = false;
             // Set up FTP attributes
-            FtpXfer.FtpServerName = m_settings.FtpServerName;
-            FtpXfer.FtpUser = m_settings.FtpUser;
-            FtpXfer.FtpPwd = m_settings.FtpPwd;
-            FtpXfer.HostFingerPrint = m_settings.HostFingerPrint;
+            FtpXfer.FtpServerName = Settings.FtpServerName;
+            FtpXfer.FtpUser = Settings.FtpUser;
+            FtpXfer.FtpPwd = Settings.FtpPwd;
+            FtpXfer.HostFingerPrint = Settings.HostFingerPrint;
 
             // arg0 - watch folder
             // arg1 - destination folder
@@ -113,14 +119,9 @@ namespace UploadContribution
         {
             string remotetagFile = Program.DestinationFolder + "/tag.txt";
             string localTagFile = GetTagFileName("tag.txt");//WorkingDir + @"\tag.txt";
-            m_settings.Verbose = true;
-            if (RunRSync(Program.LoginInfo, remotetagFile, localTagFile, false) != 0)
-            {
-                // may file does not exist, create and empty file, when sendTag is called
 
-            }
-            m_settings.Verbose = false;
-            return 0;      // download the file
+            return RunRSync(Program.Settings.LoginInfo, remotetagFile, localTagFile, false);
+   
         }
 
         /// <summary>
@@ -136,10 +137,9 @@ namespace UploadContribution
             File.AppendAllText(localTagFile, TransferLog);
             // Clear out the String
             Program.TransferLog = "";
-            m_settings.Verbose = true;
-            int status = RunRSync(Program.LoginInfo, localTagFile, remotetagFile, true);      // upload the file
-            m_settings.Verbose = false;
-            return status;
+           
+            return RunRSync(Program.Settings.LoginInfo, localTagFile, remotetagFile, true);      // upload the file
+
         }
 
         /// <summary>
@@ -150,14 +150,14 @@ namespace UploadContribution
         public static string GetBuildFile()
         {            
             string remoteFile = Program.DestinationFolder + "/PackageNames.wxi";
-            string localFile = GetTagFileName("PackageNames.wxi");//WorkingDir + @"\tag.txt";
-            m_settings.Verbose = true;
-            if (RunRSync(Program.LoginInfo, remoteFile, localFile, false) != 0)
+            string localFile = GetTagFileName("PackageNames.wxi");
+
+            if (RunRSync(Program.Settings.LoginInfo, remoteFile, localFile, false) != 0)
             {
                 // may file does not exist, create and empty file, when sendTag is called
 
             }
-            m_settings.Verbose = false;           
+                 
             return localFile;
         }
 
@@ -168,9 +168,9 @@ namespace UploadContribution
         public static int SendBuildFile(string localFile)
         {
             string remoteFile = Program.DestinationFolder + "/PackageNames.wxi";          
-            m_settings.Verbose = true;
-            int status = RunRSync(Program.LoginInfo, localFile, remoteFile, true);      // upload the file
-            m_settings.Verbose = false;
+           
+            int status = RunRSync(Program.Settings.LoginInfo, localFile, remoteFile, true);      // upload the file
+            
             return status;
         }
     
@@ -192,7 +192,7 @@ namespace UploadContribution
             // rsync -avz  -r --progress -e "ssh -i /cygdrive/c/sshKey/rsyncKey" "/cygdrive/c/temp" "suite@fileserver.skytapbuilddb.local:/home/suite/temp2/"
             ProcessStartInfo info = new ProcessStartInfo("rsync.exe");
             RsyncResult = "";
-            info.RedirectStandardOutput = m_settings.Verbose;
+            info.RedirectStandardOutput = true; // m_settings.Verbose;
             
             Uri uri = new Uri(Assembly.GetExecutingAssembly().CodeBase);
             info.WorkingDirectory = Path.GetDirectoryName(uri.LocalPath);

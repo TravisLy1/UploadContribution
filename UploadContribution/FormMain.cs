@@ -45,9 +45,8 @@ namespace UploadContribution
             string ver = string.Format("{0} {1}", Assembly.GetExecutingAssembly().GetName().Name, Assembly.GetExecutingAssembly().GetName().Version);
             this.Text =  ver + " - " + m_machineName;
 
-            // Refresh the folder list
-            // if mail is turned off, bail out
             getFolderListToolStripMenuItem_Click(null, new EventArgs());
+            
        }
 
         /// <summary>
@@ -70,10 +69,9 @@ namespace UploadContribution
                 body += "FileName = " + xInfo.Source;
 
                 string subject = "UploadContribution ERROR";
-                if (String.IsNullOrEmpty(ownerEmail))
-                    PostErrorLog("ERROR", body, xInfo.Source);
-                else
-                    SendMail(subject, body, ownerEmail);
+                if (!String.IsNullOrEmpty(ownerEmail))
+                    sendMail(subject, body, ownerEmail);
+                postErrorLog("ERROR", body, xInfo.Source);   // Always
                 addLine("ERROR: " + body, Color.Red);
                 return false;
             }
@@ -91,6 +89,8 @@ namespace UploadContribution
         {
             if (Path.GetExtension(e.Name) == ".log")
                 return;
+            if (IsDirectory(e.FullPath))
+                return;
 
             string destinationFolder =  FileNameMapping.CreateDestination(e.Name);
             string validateFolder = FileNameMapping.VerifyDestinationPath(destinationFolder);
@@ -102,14 +102,11 @@ namespace UploadContribution
             if (String.IsNullOrEmpty(validateFolder))
             {
                 // send an error email
-                string body = "Invalid Destination Path: " + destinationFolder + "\n\r" + ".  FileName = " + e.Name;
-
-                ownerEmail = FindOwnerEmail(Path.GetFullPath(e.FullPath));
+                string body = "Invalid Destination Path: " + destinationFolder + "\n\r" + "FileName = " + e.FullPath;
                 string subject = "UploadContribution ERROR";
-                if (String.IsNullOrEmpty(ownerEmail))
-                    PostErrorLog(subject, body, e.FullPath);
-                else
-                    SendMail(subject, body, ownerEmail);
+                //if (!String.IsNullOrEmpty(ownerEmail))
+                sendMail(subject, body, ownerEmail);
+                postErrorLog(subject, body, e.FullPath);
                 addLine("ERROR: " + body, Color.Red);
             }
             else
@@ -133,6 +130,16 @@ namespace UploadContribution
             updateStatus();
         }
 
+        private static bool IsDirectory(string path)
+        {
+            System.IO.FileAttributes fa = System.IO.File.GetAttributes(path);
+            bool isDirectory = false;
+            if ((fa & FileAttributes.Directory) != 0)
+            {
+                isDirectory = true;
+            }
+            return isDirectory;
+        }
         /// <summary>
         /// Actual Transfer method, threaded
         /// </summary>
@@ -166,7 +173,7 @@ namespace UploadContribution
             else
             {
                 // Something happened,  Abort transfer
-                addLine(xInfo.Source + " does not exist");
+                addLine(xInfo.Source + " does not exist", Color.Red);
                 return;
             }
             
@@ -221,14 +228,6 @@ namespace UploadContribution
             File.WriteAllLines(path, readText, Encoding.UTF8);
         }
 
-        /// <summary>
-        /// Read the content of the remote folers 
-        /// </summary>
-        /// <param name="path"></param>
-        private void updateValidFolders(string path)
-        {
-
-        }
 
         /// <summary>
         /// Transfer completed, could be success or failure
@@ -250,8 +249,7 @@ namespace UploadContribution
 
                 addLine(xInfo.Source + " uploaded successfully", Color.DarkGreen);
                 string body = "File " + xInfo.Source + " uploaded successfully!" + "\r\n";
-                body += Program.TransferLog;
-                SendMail("UploadContribution - File Uploaded Sucessfully", body, xInfo.OwnerEmail);
+                sendMail("UploadContribution - File Uploaded Sucessfully", body, xInfo.OwnerEmail);
                 // Add to list of files to be used for update build file ONLY if it's an MSI file
                 string ext = Path.GetExtension(xInfo.Source);
                 if (!String.IsNullOrEmpty(ext) && (string.Compare(ext, ".msi", true) == 0))
@@ -281,8 +279,6 @@ namespace UploadContribution
                 // Complete transfer and nothing in the queue
                 if ((m_jobs.Count == 0) && (m_jobQue.Count == 0))
                 {
-                    // Now need to get the PackageNames.wxi
-                    addLine("Getting  Build File");
                     if (m_files.Count > 0)              /// optionally update the remote BUild file
                         UpdateRemoteBuildFile();
                     UpdateRemoteTagFile();
@@ -308,6 +304,10 @@ namespace UploadContribution
                 else
                 {
                     addLine("Retries Exceeded on " + xInfo.Source);
+                    string body = "File " + xInfo.Source + " Failed to upload!" + "\r\n";
+                    body = body + "\r\n" + Program.TransferLog;
+                    sendMail("UploadContribution - File Uploaded FAILURE", body, xInfo.OwnerEmail);
+                    postErrorLog("UploadContribution - File Uploaded FAILURE", body, xInfo.Source);
                 }
             }          
             updateStatus();
@@ -318,6 +318,8 @@ namespace UploadContribution
         {
             try
             {
+                // Now need to get the PackageNames.wxi
+                addLine("Getting  Build File");
                 string fileName = Program.GetBuildFile();
                 addLine(Program.RsyncResult);
                 if (String.IsNullOrEmpty(fileName))
@@ -392,7 +394,7 @@ namespace UploadContribution
                 else
                 {
                     // Need to remove from Queue
-                    addLine("File " + fileName + " is missing!");
+                    addLine("File " + fileName + " is missing!  Must have been removed or drop was cancelled.");
                     return false;
                 }
 
@@ -535,9 +537,11 @@ namespace UploadContribution
 
         private void sendMailToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            
+            string user = Program.GetFileOwner(@"C:\tag.txt");
             // Find the owner information
-            System.Security.AccessControl.FileSecurity fs = File.GetAccessControl(@"C:\tag.txt");
-            string user = fs.GetOwner(typeof(System.Security.Principal.NTAccount)).ToString();
+            //System.Security.AccessControl.FileSecurity fs = File.GetAccessControl(@"C:\tag.txt");
+            //string user = fs.GetOwner(typeof(System.Security.Principal.NTAccount)).ToString();
             addLine("Owner is " + user);
             // Partse the username
             if (user.Contains('\\'))
@@ -558,7 +562,7 @@ namespace UploadContribution
                 if (rpc != null && rpc.Count > 0) 
                 {
                     string sendTo =  rpc[0].ToString();
-                    SendMail("Testng", "Test Body", sendTo);
+                    sendMail("Testng", "Test Body", sendTo);
                 }
             }
          }
@@ -573,46 +577,49 @@ namespace UploadContribution
             string emailAddr="";
             try
             {
-                // Find the owner information
-                System.Security.AccessControl.FileSecurity fs = File.GetAccessControl(fileName);
-                string user = fs.GetOwner(typeof(System.Security.Principal.NTAccount)).ToString();
-                //addLine("Owner is " + user);
-                // Partse the username
-                if (user.Contains('\\'))
+                string user = Program.GetFileOwner(fileName);
+
+                addLine("Owner: " + user);
+
+                if (!String.IsNullOrEmpty(user))
                 {
-                    int loc = user.LastIndexOf('\\');
-                    if (loc > 0) user = user.Substring(loc + 1);
-                }
+                    DirectoryEntry entry = new DirectoryEntry("LDAP://PROD");
+                    DirectorySearcher searcher = new DirectorySearcher(entry);
+                    searcher.Filter = "(&(objectClass=user)(samAccountName=" + user + "))";
 
-                DirectoryEntry entry = new DirectoryEntry("LDAP://PROD");
-                DirectorySearcher searcher = new DirectorySearcher(entry);
-                searcher.Filter = "(&(objectClass=user)(samAccountName=" + user + "))";
+                    SearchResult sr = searcher.FindOne();
 
-                SearchResult sr = searcher.FindOne();
-
-                if (sr != null)
-                {
-                    ResultPropertyValueCollection rpc = sr.Properties["mail"];
-                    if (rpc != null && rpc.Count > 0)
+                    if (sr != null)
                     {
-                        emailAddr = rpc[0].ToString();
+                        ResultPropertyValueCollection rpc = sr.Properties["mail"];
+                        if (rpc != null && rpc.Count > 0)
+                        {
+                            emailAddr = rpc[0].ToString();
+                        }
                     }
                 }
             }
-            catch (System.Exception)
+            catch (System.Exception ex)
             {
-
+                addLine("FindOwnerEmail Exception: " + ex.Message);
             }
             
             return emailAddr;           
         }
 
 
-        private void PostErrorLog(string subject, string body, string FileName)
+        private void postErrorLog(string subject, string body, string FileName)
         {
-            string logFileName = Path.GetFullPath(FileName) + ".log";
-            string stuff = subject + "\r\n" + body;
-            File.AppendAllText(logFileName, stuff);
+            try
+            {
+                string logFileName = Path.GetFullPath(FileName) + "_error.log";
+                string stuff = subject + "\r\n" + body;
+                File.AppendAllText(logFileName, stuff);
+            }
+            catch (SystemException ex)
+            {
+                addLine("Failed writing error Log. " + ex.Message, Color.Red);
+            }
         }
         /// <summary>
         /// Send email for notificaiton of success or failure when the user drops the file to the contribution folder
@@ -620,23 +627,22 @@ namespace UploadContribution
         /// <param name="subject"></param>
         /// <param name="body"></param>
         /// <param name="sendTo"></param>
-        private void SendMail(string subject, string body, string sendTo)
+        private void sendMail(string subject, string body, string sendTo)
         {
-            string from = "travis.ly@gmail.com";
-          
             try
             {
                 // MailMessage is used to represent the e-mail being sent
                 using (MailMessage message = new MailMessage())
                 {
-                    message.From = new MailAddress(from);
+                    message.From = new MailAddress(Program.Settings.DefaultSender,"DO NOT REPLY");
                     message.Subject = subject;
                     message.Body = body;
-               
+
                     if (!String.IsNullOrEmpty(sendTo))
                         message.To.Add(new MailAddress(sendTo));
-                    message.To.Add(new MailAddress(from));
-                                        // SmtpClient is used to send the e-mail
+                    else
+                        message.To.Add(Program.Settings.DefaultSubscribers);
+                    // SmtpClient is used to send the e-mail
                     SmtpClient mailClient = new SmtpClient(Program.Settings.MailServer);
                     mailClient.EnableSsl = false;
                     //mailClient.Credentials = new NetworkCredential("irvSwTest", "swTest");
@@ -648,6 +654,8 @@ namespace UploadContribution
 
                     // Send delivers the message to the mail server
                     mailClient.Send(message);
+                    string s = message.To.ToString();
+                    addLine("Email Sent to " + s);
                 }
             }
             catch (FormatException ex)
@@ -664,9 +672,28 @@ namespace UploadContribution
 
         private void getFolderListToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            addLine("Retrieving Folder Information...", Color.Blue);
             FtpXfer ftp = new FtpXfer();
             string destPath = Program.DestinationFolder + "/Products/";
             FileNameMapping.FolderList = ftp.GetFolderList(destPath);
+            addLine("Remote Folder Information Updated", Color.Blue);
+        }
+
+        private void checkDropFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Check the files in the drop folder
+            string [] Files = Directory.GetFiles(Program.WatchFolder);
+            foreach (string f in Files)
+            {
+                if (Path.GetExtension(f) == ".log")
+                    continue;
+                string owner = Program.GetFileOwner(f);
+                string email = FindOwnerEmail(f);
+                string s = string.Format("{0}, owner={1}, email={2}", f, owner, email);
+                addLine(s);
+                FileSystemEventArgs fse = new FileSystemEventArgs(WatcherChangeTypes.Created, Program.WatchFolder, Path.GetFileName(f));
+                m_watcher_Created(this, fse);              
+            }
         }        
 
     }

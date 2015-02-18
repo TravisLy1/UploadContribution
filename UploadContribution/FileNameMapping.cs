@@ -64,16 +64,22 @@ namespace UploadContribution
             sourceName = Path.GetFileNameWithoutExtension(sourceName);
             string destName = sourceName;
             string version = GetVesion(sourceName);
-            if (!String.IsNullOrEmpty(version))
+            try
             {
-                int loc = sourceName.IndexOf(version);
-                destName = sourceName.Remove(loc, version.Length + 1);  // 
+                if (!String.IsNullOrEmpty(version))
+                {
+                    int loc = sourceName.IndexOf(version);
+                    destName = sourceName.Remove(loc, version.Length + 1);  // 
+                }
+                else
+                {
+                    int pos = destName.LastIndexOf("_");
+                    if (pos > 0)
+                        destName = destName.Substring(0, pos);
+                }
             }
-            else
-            {
-                int pos = destName.LastIndexOf("_");
-                destName = destName.Substring(0, pos);
-            }
+            catch (Exception)
+            { }
             return destName;
         }
 

@@ -124,5 +124,41 @@ namespace UploadContribution.Properties {
                 this["MailServer"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("daniel.wood@software.dell.com")]
+        public string DefaultSender {
+            get {
+                return ((string)(this["DefaultSender"]));
+            }
+            set {
+                this["DefaultSender"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("travis.ly@software.dell.com,travis.ly@hotmail.com")]
+        public string DefaultSubscribers {
+            get {
+                return ((string)(this["DefaultSubscribers"]));
+            }
+            set {
+                this["DefaultSubscribers"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("dev.quest.corp")]
+        public string Domain {
+            get {
+                return ((string)(this["Domain"]));
+            }
+            set {
+                this["Domain"] = value;
+            }
+        }
     }
 }

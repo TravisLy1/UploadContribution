@@ -32,5 +32,14 @@
     <Setting Name="MailServer" Type="System.String" Scope="User">
       <Value Profile="(Default)">relay.prod.quest.corp</Value>
     </Setting>
+    <Setting Name="DefaultSender" Type="System.String" Scope="User">
+      <Value Profile="(Default)">daniel.wood@software.dell.com</Value>
+    </Setting>
+    <Setting Name="DefaultSubscribers" Type="System.String" Scope="User">
+      <Value Profile="(Default)">travis.ly@software.dell.com,travis.ly@hotmail.com</Value>
+    </Setting>
+    <Setting Name="Domain" Type="System.String" Scope="User">
+      <Value Profile="(Default)">dev.quest.corp</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

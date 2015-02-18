@@ -70,6 +70,45 @@ namespace UploadContribution
             Application.Run(new FormMain());
         }
 
+        public static string GetFileOwner(string path)
+        {
+            string arg = string.Format("dir /q {0}", path);
+            string s = CmdDir(arg);
+            string owner = "";
+            if (!String.IsNullOrEmpty(s))
+            {
+                Match match = Regex.Match(s, @"PROD\\([\S+]*)", RegexOptions.IgnoreCase);
+                if (match.Success)
+                    owner =  match.Groups[1].Value;
+            }
+            return owner;
+        }
+
+        /// <summary>
+        /// Execute a CMD.exe 
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public static string CmdDir(string arg)
+        {
+            string result;
+            ProcessStartInfo info = new ProcessStartInfo("cmd.exe");
+            Uri uri = new Uri(Assembly.GetExecutingAssembly().CodeBase);
+            info.WorkingDirectory = Path.GetDirectoryName(uri.LocalPath);
+            WorkingDir = info.WorkingDirectory;
+            //info.Arguments = string.Format("/C dir /q {0}", fileName);
+            info.Arguments = string.Format(" /C {0}", arg);
+            info.UseShellExecute = false;
+            info.RedirectStandardOutput = true;
+            info.WindowStyle = ProcessWindowStyle.Hidden;
+            Process process = Process.Start(info);
+            result = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
+            if (process.ExitCode != 0)
+                throw new Exception(String.Format("CmdDir returns non zero exit code {0}", process.ExitCode));
+           
+            return result;
+        }
         /// <summary>
         /// Get a CygPath necessary for executing the Rsync function.  Again assume all the necessary files are in the same place
         /// </summary>
@@ -117,11 +156,15 @@ namespace UploadContribution
         // make this verbose
         public static int GetTagFile()
         {
+            int status = -1;
+            int retry = Program.settings.TransferMaxRetries;
             string remotetagFile = Program.DestinationFolder + "/tag.txt";
             string localTagFile = GetTagFileName("tag.txt");//WorkingDir + @"\tag.txt";
-
-            return RunRSync(Program.Settings.LoginInfo, remotetagFile, localTagFile, false);
-   
+            while ((status != 0) && (retry-- > 0))
+            {
+                status = RunRSync(Program.Settings.LoginInfo, remotetagFile, localTagFile, false);
+            }
+            return status;
         }
 
         /// <summary>
@@ -130,6 +173,8 @@ namespace UploadContribution
         /// <returns></returns>
         public static int SendTagFile()
         {
+            int status = -1;
+            int retry = Program.settings.TransferMaxRetries;
             string remotetagFile = Program.DestinationFolder + "/tag.txt";
             string localTagFile = GetTagFileName("tag.txt");
             // Need to add to the file
@@ -137,9 +182,11 @@ namespace UploadContribution
             File.AppendAllText(localTagFile, TransferLog);
             // Clear out the String
             Program.TransferLog = "";
-           
-            return RunRSync(Program.Settings.LoginInfo, localTagFile, remotetagFile, true);      // upload the file
-
+            while ((status != 0) && (retry-- > 0))
+            {
+                status = RunRSync(Program.Settings.LoginInfo, localTagFile, remotetagFile, true);      // upload the file
+            }
+            return status;
         }
 
         /// <summary>
@@ -148,17 +195,20 @@ namespace UploadContribution
         /// </summary>
         /// <returns> the full local filename</returns>
         public static string GetBuildFile()
-        {            
+        {
+            int status = -1;
+            int retry = Program.settings.TransferMaxRetries;
             string remoteFile = Program.DestinationFolder + "/PackageNames.wxi";
             string localFile = GetTagFileName("PackageNames.wxi");
 
-            if (RunRSync(Program.Settings.LoginInfo, remoteFile, localFile, false) != 0)
+            while ((status != 0) && (retry-- > 0))
             {
-                // may file does not exist, create and empty file, when sendTag is called
-
+                status =  RunRSync(Program.Settings.LoginInfo, remoteFile, localFile, false);
             }
-                 
-            return localFile;
+            if (status == 0)
+                return localFile;
+            else
+                return null;
         }
 
         /// <summary>
@@ -167,10 +217,13 @@ namespace UploadContribution
         /// <returns></returns>
         public static int SendBuildFile(string localFile)
         {
-            string remoteFile = Program.DestinationFolder + "/PackageNames.wxi";          
-           
-            int status = RunRSync(Program.Settings.LoginInfo, localFile, remoteFile, true);      // upload the file
-            
+            int status = -1;
+            int retry = Program.settings.TransferMaxRetries;
+            string remoteFile = Program.DestinationFolder + "/PackageNames.wxi";
+            while ((status != 0) && (retry-- > 0))
+            {
+                status = RunRSync(Program.Settings.LoginInfo, localFile, remoteFile, true);      // upload the file
+            }
             return status;
         }
     

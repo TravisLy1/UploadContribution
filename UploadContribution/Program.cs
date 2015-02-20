@@ -21,6 +21,7 @@ namespace UploadContribution
         public static string TransferLog;
         //public static int TransferMaxRetries;
         public static string RsyncResult;
+        public static FormMain mainForm;
         private static UploadContribution.Properties.Settings settings;
 
         public static UploadContribution.Properties.Settings Settings
@@ -67,7 +68,8 @@ namespace UploadContribution
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FormMain());
+            mainForm = new FormMain();
+            Application.Run(mainForm);
         }
 
         public static string GetFileOwner(string path)
@@ -163,6 +165,7 @@ namespace UploadContribution
             while ((status != 0) && (retry-- > 0))
             {
                 status = RunRSync(Program.Settings.LoginInfo, remotetagFile, localTagFile, false);
+                mainForm.addLine(RsyncResult);
             }
             return status;
         }
@@ -185,6 +188,7 @@ namespace UploadContribution
             while ((status != 0) && (retry-- > 0))
             {
                 status = RunRSync(Program.Settings.LoginInfo, localTagFile, remotetagFile, true);      // upload the file
+                mainForm.addLine(RsyncResult);
             }
             return status;
         }
@@ -204,6 +208,7 @@ namespace UploadContribution
             while ((status != 0) && (retry-- > 0))
             {
                 status =  RunRSync(Program.Settings.LoginInfo, remoteFile, localFile, false);
+                mainForm.addLine(RsyncResult);
             }
             if (status == 0)
                 return localFile;
@@ -223,6 +228,7 @@ namespace UploadContribution
             while ((status != 0) && (retry-- > 0))
             {
                 status = RunRSync(Program.Settings.LoginInfo, localFile, remoteFile, true);      // upload the file
+                mainForm.addLine(RsyncResult);
             }
             return status;
         }

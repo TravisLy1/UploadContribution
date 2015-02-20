@@ -321,7 +321,7 @@ namespace UploadContribution
                 // Now need to get the PackageNames.wxi
                 addLine("Getting  Build File");
                 string fileName = Program.GetBuildFile();
-                addLine(Program.RsyncResult);
+                //addLine(Program.RsyncResult);
                 if (String.IsNullOrEmpty(fileName))
                 {
                     // raise some errors
@@ -334,7 +334,7 @@ namespace UploadContribution
                     // Upload Build File
                     addLine("Updating Build File");
                     Program.SendBuildFile(fileName);
-                    addLine(Program.RsyncResult);
+                    //addLine(Program.RsyncResult);
                 }
             }
             catch (System.Exception ex)
@@ -357,12 +357,12 @@ namespace UploadContribution
                 }
                 else
                 {
-                    addLine(Program.RsyncResult);
+                    //addLine(Program.RsyncResult);
 
                     // upload tag file
                     addLine("Updating Tag File");
                     Program.SendTagFile();          // Send Tag file
-                    addLine(Program.RsyncResult);
+                    //addLine(Program.RsyncResult);
                 }
             }
             catch (System.Exception ex)
@@ -452,7 +452,7 @@ namespace UploadContribution
         }
 
         private delegate void AddLineCallBack(string Value, Color? c = null);
-        private void addLine(string line, Color? c = null)
+        public void addLine(string line, Color? c = null)
         {
             Color color = c ?? Color.Black;
 
@@ -694,6 +694,21 @@ namespace UploadContribution
                 FileSystemEventArgs fse = new FileSystemEventArgs(WatcherChangeTypes.Created, Program.WatchFolder, Path.GetFileName(f));
                 m_watcher_Created(this, fse);              
             }
+        }
+
+        private void tagFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            int status = Program.GetTagFile();
+        }
+
+        private void buildFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string s = Program.GetBuildFile();
+        }
+
+        private void tsLabelDestination_Click(object sender, EventArgs e)
+        {
+
         }        
 
     }

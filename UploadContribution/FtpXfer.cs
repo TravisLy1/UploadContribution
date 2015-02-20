@@ -111,10 +111,13 @@ namespace UploadContribution
                             // check for MSI extension
                             if (rfInfo.Name.ToLower().EndsWith(".msi"))
                             {
-                                // rename it to the new MSI Name
-                                string cmd = string.Format("mv {0} {1}", folderPath + "/" + rfInfo.Name, folderPath + "/" + newFileName);
-                                session.ExecuteCommand(cmd);
-                                LastStatus = "Renamed " + rfInfo.Name + " to " + newFileName;
+                                if (rfInfo.Name != newFileName)
+                                { 
+                                    // rename it to the new MSI Name
+                                    string cmd = string.Format("mv {0} {1}", folderPath + "/" + rfInfo.Name, folderPath + "/" + newFileName);
+                                    session.ExecuteCommand(cmd);
+                                    LastStatus = "Renamed " + rfInfo.Name + " to " + newFileName;
+                                }
                                 break;              // Done!  Exit
                             }
                         }

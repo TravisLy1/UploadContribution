@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.IO;
 using System.Security.AccessControl;
-
+using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -146,9 +146,15 @@ namespace UploadContribution
         /// <param name="xInfo"></param>
         private void doTransfer(XferJobInfo xInfo)
         {
-            if (IsLocked(xInfo.Source) )
-                return;          // File is lockec cannot transfer
-           
+            //if (IsLocked(xInfo.Source) )
+            //    return;          // File is lockec cannot transfer
+            string ext = Path.GetExtension(xInfo.Source);
+            if (!String.IsNullOrEmpty(ext) && (string.Compare(ext, ".msi", true) == 0))
+            {   // Check for lock on MSI file only, HTML should not have an issue
+                if (FileUtil.IsFileLocked(xInfo.Source, 3))
+                    return;
+            }
+
             lock(m_jobQue)
                 m_jobQue.Remove(xInfo);   // Move from Que to Jobs
             if (File.Exists(xInfo.Source))
@@ -158,6 +164,7 @@ namespace UploadContribution
                 // before transferring, need to look at the destination
                 if (Path.GetExtension(xInfo.Source) == ".msi")
                 {
+                    addLine("Renaming Remote File at " + xInfo.Destination);
                     FtpXfer ftp = new FtpXfer();
                     ftp.renameMSIFile(xInfo.Destination, Path.GetFileName(xInfo.Source));
                     addLine(ftp.LastStatus);
@@ -173,7 +180,7 @@ namespace UploadContribution
             else
             {
                 // Something happened,  Abort transfer
-                addLine(xInfo.Source + " does not exist", Color.Red);
+                addLine(xInfo.Source + " does not exist. May have been deleted...", Color.Red);
                 return;
             }
             
@@ -379,14 +386,24 @@ namespace UploadContribution
         /// <returns></returns>
         private bool IsLocked(string fileName)
         {
+            
+
             try
             {
                 Stream s = new FileStream(fileName, FileMode.Open);
                 s.Close();
+                
                 return false;
             }
             catch
             {
+                // Findout who is locking
+                List<Process> procs = FileUtil.WhoIsLocking(fileName);
+                foreach (Process p in procs)
+                {
+                    addLine(fileName + " locked by " + p.ToString() + " - " + p.Handle);
+                }
+
                 if (File.Exists(fileName))
                 {
                     return true;
@@ -433,6 +450,7 @@ namespace UploadContribution
                 // set the folder
                Program.WatchFolder = openFolderDlg.SelectedPath;
                startWatching();
+ 
             }
         }
 
@@ -451,21 +469,23 @@ namespace UploadContribution
             }
         }
 
-        private delegate void AddLineCallBack(string Value, Color? c = null);
-        public void addLine(string line, Color? c = null)
+        private delegate void AddLineCallBack(string Value, Color? c = null, bool? notime = false);
+        public void addLine(string line, Color? c = null, bool? notime = false)
         {
             Color color = c ?? Color.Black;
+            bool noTimestamp = notime ?? true;
 
             if (InvokeRequired)
             {
                 AddLineCallBack d = new AddLineCallBack(addLine);
-                this.BeginInvoke(d, line, color);
+                this.BeginInvoke(d, line, color, noTimestamp);
             }
             else
             {
-
-                string msg = DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToShortDateString();
-                msg = msg + " " + line + "\n";
+                string msg =" ";
+                if (!noTimestamp)
+                    msg = DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToShortDateString() + " ";
+                msg = msg + line + "\n";
                 AppendTrace(m_textTrace, msg, color);
            
                 Application.DoEvents();
@@ -537,35 +557,8 @@ namespace UploadContribution
 
         private void sendMailToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            
-            string user = Program.GetFileOwner(@"C:\tag.txt");
-            // Find the owner information
-            //System.Security.AccessControl.FileSecurity fs = File.GetAccessControl(@"C:\tag.txt");
-            //string user = fs.GetOwner(typeof(System.Security.Principal.NTAccount)).ToString();
-            addLine("Owner is " + user);
-            // Partse the username
-            if (user.Contains('\\'))
-            {
-                int loc = user.LastIndexOf('\\');
-                user = user.Substring(loc+1);
-            }
-            DirectoryEntry entry = new DirectoryEntry("LDAP://PROD");
-            DirectorySearcher searcher = new DirectorySearcher(entry);
-
-            searcher.Filter = "(&(objectClass=user)(samAccountName=" + user + "))";
-
-            SearchResult sr = searcher.FindOne();
-
-            if (sr != null)
-            {
-                ResultPropertyValueCollection rpc = sr.Properties["mail"];
-                if (rpc != null && rpc.Count > 0) 
-                {
-                    string sendTo =  rpc[0].ToString();
-                    sendMail("Testng", "Test Body", sendTo);
-                }
-            }
-         }
+              
+        }
 
         /// <summary>
         /// Find the owner's email 
@@ -574,6 +567,7 @@ namespace UploadContribution
         /// <returns></returns>
         private string FindOwnerEmail(string fileName)
         {
+            
             string emailAddr="";
             try
             {
@@ -634,7 +628,7 @@ namespace UploadContribution
                 // MailMessage is used to represent the e-mail being sent
                 using (MailMessage message = new MailMessage())
                 {
-                    message.From = new MailAddress(Program.Settings.DefaultSender,"DO NOT REPLY");
+                    message.From = new MailAddress(Program.Settings.DefaultSender);
                     message.Subject = subject;
                     message.Body = body;
 
@@ -676,7 +670,12 @@ namespace UploadContribution
             FtpXfer ftp = new FtpXfer();
             string destPath = Program.DestinationFolder + "/Products/";
             FileNameMapping.FolderList = ftp.GetFolderList(destPath);
+            foreach (string f in FileNameMapping.FolderList)
+            {
+                addLine("\t" + f, Color.Blue, true);
+            }
             addLine("Remote Folder Information Updated", Color.Blue);
+
         }
 
         private void checkDropFolderToolStripMenuItem_Click(object sender, EventArgs e)
@@ -698,17 +697,44 @@ namespace UploadContribution
 
         private void tagFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            int status = Program.GetTagFile();
+            if (Program.GetTagFile() == 0)
+            { 
+                int start=0;
+                string[] readText = File.ReadAllLines(Program.LocalTagFile, Encoding.UTF8);
+                if (readText.Length > 10)
+                    start = readText.Length - 10;
+                for (int i = start; i < readText.Length; i++)
+                {
+                    addLine(readText[i], Color.BlueViolet, true);
+                }
+            }
+
         }
 
         private void buildFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string s = Program.GetBuildFile();
+            string path = Program.GetBuildFile();
+            if (!String.IsNullOrEmpty(path))
+            {
+                // dump the file to the screen
+                // Open the file, read all lines
+                string[] readText = File.ReadAllLines(path, Encoding.UTF8);
+
+                for (int i = 0; i < readText.Length; i++)
+                {
+                    addLine(readText[i], Color.BlueViolet, true);
+                }
+            }
         }
 
         private void tsLabelDestination_Click(object sender, EventArgs e)
         {
+           
+        }
 
+        private void validFoldersToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Get the folders from 
         }        
 
     }

@@ -46,12 +46,16 @@
             this.tsTextTransferring = new System.Windows.Forms.ToolStripTextBox();
             this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
             this.tsLabelDestination = new System.Windows.Forms.ToolStripLabel();
-            this.m_textTrace = new System.Windows.Forms.RichTextBox();
             this.openFileDlg = new System.Windows.Forms.OpenFileDialog();
             this.openFolderDlg = new System.Windows.Forms.FolderBrowserDialog();
             this.timerTransfer = new System.Windows.Forms.Timer(this.components);
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.tsLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStatusText = new System.Windows.Forms.ToolStripStatusLabel();
+            this.m_textTrace = new System.Windows.Forms.RichTextBox();
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -186,15 +190,6 @@
             this.tsLabelDestination.Text = "toolStripLabel3";
             this.tsLabelDestination.Click += new System.EventHandler(this.tsLabelDestination_Click);
             // 
-            // m_textTrace
-            // 
-            this.m_textTrace.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.m_textTrace.Location = new System.Drawing.Point(0, 52);
-            this.m_textTrace.Name = "m_textTrace";
-            this.m_textTrace.Size = new System.Drawing.Size(678, 425);
-            this.m_textTrace.TabIndex = 2;
-            this.m_textTrace.Text = "";
-            // 
             // openFileDlg
             // 
             this.openFileDlg.FileName = "openFileDialog1";
@@ -205,12 +200,43 @@
             this.timerTransfer.Interval = 5000;
             this.timerTransfer.Tick += new System.EventHandler(this.timerTransfer_Tick);
             // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsLabel,
+            this.toolStatusText});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 455);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(678, 22);
+            this.statusStrip1.TabIndex = 3;
+            // 
+            // tsLabel
+            // 
+            this.tsLabel.Name = "tsLabel";
+            this.tsLabel.Size = new System.Drawing.Size(0, 17);
+            // 
+            // toolStatusText
+            // 
+            this.toolStatusText.Name = "toolStatusText";
+            this.toolStatusText.Size = new System.Drawing.Size(13, 17);
+            this.toolStatusText.Text = "..";
+            // 
+            // m_textTrace
+            // 
+            this.m_textTrace.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.m_textTrace.Location = new System.Drawing.Point(0, 52);
+            this.m_textTrace.Name = "m_textTrace";
+            this.m_textTrace.Size = new System.Drawing.Size(678, 403);
+            this.m_textTrace.TabIndex = 4;
+            this.m_textTrace.Text = "";
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(678, 477);
             this.Controls.Add(this.m_textTrace);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -221,6 +247,8 @@
             this.menuStrip1.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -231,7 +259,6 @@
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.RichTextBox m_textTrace;
         private System.Windows.Forms.OpenFileDialog openFileDlg;
         private System.Windows.Forms.FolderBrowserDialog openFolderDlg;
         private System.Windows.Forms.Timer timerTransfer;
@@ -248,5 +275,9 @@
         private System.Windows.Forms.ToolStripMenuItem getToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem tagFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem buildFileToolStripMenuItem;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.RichTextBox m_textTrace;
+        private System.Windows.Forms.ToolStripStatusLabel tsLabel;
+        private System.Windows.Forms.ToolStripStatusLabel toolStatusText;
     }
 }

@@ -19,7 +19,8 @@ namespace UploadContribution
         public static string ProductFamily;
         public static string WorkingDir;
         public static string TransferLog;
-        //public static int TransferMaxRetries;
+        public static string LocalTagFile;
+      
         public static string RsyncResult;
         public static FormMain mainForm;
         private static UploadContribution.Properties.Settings settings;
@@ -74,7 +75,7 @@ namespace UploadContribution
 
         public static string GetFileOwner(string path)
         {
-            string arg = string.Format("dir /q {0}", path);
+            string arg = string.Format("dir /q \"{0}\"", path);
             string s = CmdDir(arg);
             string owner = "";
             if (!String.IsNullOrEmpty(s))
@@ -100,6 +101,7 @@ namespace UploadContribution
             WorkingDir = info.WorkingDirectory;
             //info.Arguments = string.Format("/C dir /q {0}", fileName);
             info.Arguments = string.Format(" /C {0}", arg);
+            
             info.UseShellExecute = false;
             info.RedirectStandardOutput = true;
             info.WindowStyle = ProcessWindowStyle.Hidden;
@@ -161,10 +163,10 @@ namespace UploadContribution
             int status = -1;
             int retry = Program.settings.TransferMaxRetries;
             string remotetagFile = Program.DestinationFolder + "/tag.txt";
-            string localTagFile = GetTagFileName("tag.txt");//WorkingDir + @"\tag.txt";
+            LocalTagFile = GetTagFileName("tag.txt");//WorkingDir + @"\tag.txt";
             while ((status != 0) && (retry-- > 0))
             {
-                status = RunRSync(Program.Settings.LoginInfo, remotetagFile, localTagFile, false);
+                status = RunRSync(Program.Settings.LoginInfo, remotetagFile, LocalTagFile, false);
                 mainForm.addLine(RsyncResult);
             }
             return status;

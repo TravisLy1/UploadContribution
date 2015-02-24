@@ -33,10 +33,10 @@
       <Value Profile="(Default)">relay.prod.quest.corp</Value>
     </Setting>
     <Setting Name="DefaultSender" Type="System.String" Scope="User">
-      <Value Profile="(Default)">daniel.wood@software.dell.com</Value>
+      <Value Profile="(Default)">No-Reply.DSG.RD.Suite.Build@software.dell.com</Value>
     </Setting>
     <Setting Name="DefaultSubscribers" Type="System.String" Scope="User">
-      <Value Profile="(Default)">travis.ly@software.dell.com,travis.ly@hotmail.com</Value>
+      <Value Profile="(Default)">travis.ly@software.dell.com, Daniel.Wood@software.dell.com,Sergio.Vidales@software.dell.com</Value>
     </Setting>
     <Setting Name="Domain" Type="System.String" Scope="User">
       <Value Profile="(Default)">dev.quest.corp</Value>

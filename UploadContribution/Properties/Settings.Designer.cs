@@ -127,7 +127,7 @@ namespace UploadContribution.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("daniel.wood@software.dell.com")]
+        [global::System.Configuration.DefaultSettingValueAttribute("No-Reply.DSG.RD.Suite.Build@software.dell.com")]
         public string DefaultSender {
             get {
                 return ((string)(this["DefaultSender"]));
@@ -139,7 +139,8 @@ namespace UploadContribution.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("travis.ly@software.dell.com,travis.ly@hotmail.com")]
+        [global::System.Configuration.DefaultSettingValueAttribute("travis.ly@software.dell.com, Daniel.Wood@software.dell.com,Sergio.Vidales@softwar" +
+            "e.dell.com")]
         public string DefaultSubscribers {
             get {
                 return ((string)(this["DefaultSubscribers"]));

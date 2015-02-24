@@ -670,6 +670,7 @@ namespace UploadContribution
             FtpXfer ftp = new FtpXfer();
             string destPath = Program.DestinationFolder + "/Products/";
             FileNameMapping.FolderList = ftp.GetFolderList(destPath);
+            FileNameMapping.FolderList.Sort();
             foreach (string f in FileNameMapping.FolderList)
             {
                 addLine("\t" + f, Color.Blue, true);

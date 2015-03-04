@@ -100,14 +100,14 @@
             // tagFileToolStripMenuItem
             // 
             this.tagFileToolStripMenuItem.Name = "tagFileToolStripMenuItem";
-            this.tagFileToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.tagFileToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
             this.tagFileToolStripMenuItem.Text = "Tag File";
             this.tagFileToolStripMenuItem.Click += new System.EventHandler(this.tagFileToolStripMenuItem_Click);
             // 
             // buildFileToolStripMenuItem
             // 
             this.buildFileToolStripMenuItem.Name = "buildFileToolStripMenuItem";
-            this.buildFileToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.buildFileToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
             this.buildFileToolStripMenuItem.Text = "Build File";
             this.buildFileToolStripMenuItem.Click += new System.EventHandler(this.buildFileToolStripMenuItem_Click);
             // 
@@ -116,8 +116,7 @@
             this.tsTestText.Name = "tsTestText";
             this.tsTestText.Size = new System.Drawing.Size(200, 23);
             this.tsTestText.Text = "TestName";
-            this.tsTestText.Visible = false;
-            this.tsTestText.TextChanged += new System.EventHandler(this.tsTestText_TextChanged);
+            this.tsTestText.DoubleClick += new System.EventHandler(this.tsTestText_DoubleClick);
             // 
             // checkDropFolderToolStripMenuItem
             // 

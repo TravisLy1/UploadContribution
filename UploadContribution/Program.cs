@@ -219,6 +219,34 @@ namespace UploadContribution
         }
 
         /// <summary>
+        /// Get a versionn File
+        /// </summary>
+        /// <returns></returns>
+        public static string GetVersionFile()
+        {
+            string remoteFile = Program.DestinationFolder + "/versionInfo.txt";
+            string localFile = GetTagFileName("versionInfo.txt");
+            return localFile;
+        }
+
+        /// <summary>
+        /// Send the version File to remote, may be used for label
+        /// </summary>
+        /// <param name="localFile"></param>
+        /// <returns></returns>
+        public static int SendVersion(string localFile)
+        {
+            int status = -1;
+            int retry = Program.settings.TransferMaxRetries;
+            string remoteFile = Program.DestinationFolder + "/versionInfo.txt";
+            while ((status != 0) && (retry-- > 0))
+            {
+                status = RunRSync(Program.Settings.LoginInfo, localFile, remoteFile, true);      // upload the file
+                mainForm.addLine(RsyncResult);
+            }
+            return status;
+        }
+        /// <summary>
         /// Save the build file back to the server
         /// </summary>
         /// <returns></returns>

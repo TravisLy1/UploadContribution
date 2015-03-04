@@ -25,7 +25,7 @@ namespace UploadContribution.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("suite@fileserver.skytapbuilddb.local")]
+        [global::System.Configuration.DefaultSettingValueAttribute("rsyncjob@skytapbuilddb.com")]
         public string LoginInfo {
             get {
                 return ((string)(this["LoginInfo"]));
@@ -43,7 +43,7 @@ namespace UploadContribution.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("/mnt/share/Share/Xfer/DSIBuild/Toad_for_Oracle_Installer/Bundle")]
+        [global::System.Configuration.DefaultSettingValueAttribute("/home/rsyncjob/Bundle")]
         public string DestinationPath {
             get {
                 return ((string)(this["DestinationPath"]));
@@ -79,7 +79,7 @@ namespace UploadContribution.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("fileserver.skytapbuilddb.local")]
+        [global::System.Configuration.DefaultSettingValueAttribute("skytapbuilddb.com")]
         public string FtpServerName {
             get {
                 return ((string)(this["FtpServerName"]));
@@ -88,7 +88,7 @@ namespace UploadContribution.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("suite")]
+        [global::System.Configuration.DefaultSettingValueAttribute("rsyncjob")]
         public string FtpUser {
             get {
                 return ((string)(this["FtpUser"]));
@@ -97,7 +97,7 @@ namespace UploadContribution.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("suite")]
+        [global::System.Configuration.DefaultSettingValueAttribute("runjob")]
         public string FtpPwd {
             get {
                 return ((string)(this["FtpPwd"]));
@@ -106,7 +106,7 @@ namespace UploadContribution.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ssh-rsa 2048 d1:d6:8f:38:b3:4b:e0:c2:40:2f:f1:67:bd:eb:21:57")]
+        [global::System.Configuration.DefaultSettingValueAttribute("ssh-rsa 2048 5a:fa:cd:78:b5:01:00:d6:36:71:e8:b0:15:cb:f6:37")]
         public string HostFingerPrint {
             get {
                 return ((string)(this["HostFingerPrint"]));
@@ -139,8 +139,7 @@ namespace UploadContribution.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("travis.ly@software.dell.com, Daniel.Wood@software.dell.com,Sergio.Vidales@softwar" +
-            "e.dell.com")]
+        [global::System.Configuration.DefaultSettingValueAttribute("travis.ly@software.dell.com")]
         public string DefaultSubscribers {
             get {
                 return ((string)(this["DefaultSubscribers"]));
@@ -159,6 +158,18 @@ namespace UploadContribution.Properties {
             }
             set {
                 this["Domain"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Trial,Beta,Freeware")]
+        public string VersionModifiers {
+            get {
+                return ((string)(this["VersionModifiers"]));
+            }
+            set {
+                this["VersionModifiers"] = value;
             }
         }
     }

@@ -49,9 +49,37 @@ namespace UploadContribution
             if (match.Success)
                 return match.Groups[0].Value;
             else
-                return null;
+                return GetVersionModifier(path);
         }
-
+        /// <summary>
+        /// Ther may be modifiers
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        private static string GetVersionModifier(string path)
+        {
+            string returnVersion = ""; 
+            string versionPattern = @"\d+(\.\d+)+";
+            if (!String.IsNullOrEmpty(Program.Settings.VersionModifiers))
+            {
+                string [] mods = Program.Settings.VersionModifiers.Split(new char [] {','});
+                foreach (string m in mods)
+                {
+                    string pattern = string.Format("{0}_{1}", m, versionPattern);
+                    Match match = Regex.Match(path, pattern, RegexOptions.IgnoreCase);
+                    if (match.Success)
+                    {
+                        returnVersion = match.Groups[0].Value;
+                        break;
+                    }
+                }
+            }
+            if (String.IsNullOrEmpty(returnVersion))
+            {
+                returnVersion = GetVesion(path);
+            }
+            return returnVersion;    
+        }
         /// <summary>
         /// Remove the version from the string and return the destination 
         /// for example,  BackupReporter_2.0.0.14_x86_EN.msi  =>  BackupReporter_x86_EN

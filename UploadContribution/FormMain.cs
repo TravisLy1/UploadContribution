@@ -286,6 +286,11 @@ namespace UploadContribution
                 // Complete transfer and nothing in the queue
                 if ((m_jobs.Count == 0) && (m_jobQue.Count == 0))
                 {
+                    string path = Program.GetVersionFile();
+                    // Send VersionInfo file
+                    File.WriteAllLines(path, m_files.Values, Encoding.UTF8);
+                    Program.SendVersion(path);
+
                     if (m_files.Count > 0)              /// optionally update the remote BUild file
                         UpdateRemoteBuildFile();
                     UpdateRemoteTagFile();
@@ -320,7 +325,10 @@ namespace UploadContribution
             updateStatus();
         }
 
-        
+        private void updateVersionInfo(string path)
+        {
+           File.WriteAllLines(path, m_files.Values, Encoding.UTF8); 
+        }    
         private void UpdateRemoteBuildFile()
         {
             try
@@ -607,7 +615,7 @@ namespace UploadContribution
             try
             {
                 string logFileName = Path.GetFullPath(FileName) + "_error.log";
-                string stuff = subject + "\r\n" + body;
+                string stuff =  "\r\n"+ subject + "\r\n" + body;
                 File.AppendAllText(logFileName, stuff);
             }
             catch (SystemException ex)
@@ -671,6 +679,8 @@ namespace UploadContribution
             string destPath = Program.DestinationFolder + "/Products/";
             FileNameMapping.FolderList = ftp.GetFolderList(destPath);
             FileNameMapping.FolderList.Sort();
+            if (!String.IsNullOrEmpty(ftp.LastStatus))
+                addLine("Ftp Error: " + ftp.LastStatus);
             foreach (string f in FileNameMapping.FolderList)
             {
                 addLine("\t" + f, Color.Blue, true);
@@ -736,6 +746,12 @@ namespace UploadContribution
         private void validFoldersToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // Get the folders from 
+        }
+
+        private void tsTestText_DoubleClick(object sender, EventArgs e)
+        {
+            string fileName = tsTestText.Text;
+            addLine("Folder = " +  FileNameMapping.CreateDestination(fileName));
         }        
 
     }

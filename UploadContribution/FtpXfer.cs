@@ -57,6 +57,7 @@ namespace UploadContribution
                 Password = FtpPwd,
                 SshHostKeyFingerprint = HostFingerPrint
             };
+            LastStatus = "";
             try
             {
                 using (Session session = new Session())
@@ -98,6 +99,7 @@ namespace UploadContribution
             };
             try
             {
+                LastStatus = "";
                 using (Session session = new Session())
                 {
                     session.Open(sessionOptions); //Attempts to connect to your sFtp site

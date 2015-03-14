@@ -67,6 +67,7 @@ namespace UploadContribution
             DirectoryInfo di = new DirectoryInfo(WatchFolder);
             ProductFamily = di.Name;
 
+ 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             mainForm = new FormMain();
@@ -162,7 +163,8 @@ namespace UploadContribution
         {
             int status = -1;
             int retry = Program.settings.TransferMaxRetries;
-            string remotetagFile = Program.DestinationFolder + "/tag.txt";
+            //productDestinationPath = Program.DestinationFolder + "/Bundle/
+            string remotetagFile = Program.DestinationFolder + "/Bundle/tag.txt";
             LocalTagFile = GetTagFileName("tag.txt");//WorkingDir + @"\tag.txt";
             while ((status != 0) && (retry-- > 0))
             {
@@ -180,7 +182,7 @@ namespace UploadContribution
         {
             int status = -1;
             int retry = Program.settings.TransferMaxRetries;
-            string remotetagFile = Program.DestinationFolder + "/tag.txt";
+            string remotetagFile = Program.DestinationFolder + "/Bundle/tag.txt";
             string localTagFile = GetTagFileName("tag.txt");
             // Need to add to the file
             // Append the Transfer Log
@@ -204,7 +206,7 @@ namespace UploadContribution
         {
             int status = -1;
             int retry = Program.settings.TransferMaxRetries;
-            string remoteFile = Program.DestinationFolder + "/PackageNames.wxi";
+            string remoteFile = Program.DestinationFolder + "/Bundle/PackageNames.wxi";
             string localFile = GetTagFileName("PackageNames.wxi");
 
             while ((status != 0) && (retry-- > 0))
@@ -224,7 +226,7 @@ namespace UploadContribution
         /// <returns></returns>
         public static string GetVersionFile()
         {
-            string remoteFile = Program.DestinationFolder + "/versionInfo.txt";
+            string remoteFile = Program.DestinationFolder + "/Bundle/versionInfo.txt";
             string localFile = GetTagFileName("versionInfo.txt");
             return localFile;
         }
@@ -238,7 +240,7 @@ namespace UploadContribution
         {
             int status = -1;
             int retry = Program.settings.TransferMaxRetries;
-            string remoteFile = Program.DestinationFolder + "/versionInfo.txt";
+            string remoteFile = Program.DestinationFolder + "/Bundle/versionInfo.txt";
             while ((status != 0) && (retry-- > 0))
             {
                 status = RunRSync(Program.Settings.LoginInfo, localFile, remoteFile, true);      // upload the file
@@ -254,7 +256,7 @@ namespace UploadContribution
         {
             int status = -1;
             int retry = Program.settings.TransferMaxRetries;
-            string remoteFile = Program.DestinationFolder + "/PackageNames.wxi";
+            string remoteFile = Program.DestinationFolder + "/Bundle/PackageNames.wxi";
             while ((status != 0) && (retry-- > 0))
             {
                 status = RunRSync(Program.Settings.LoginInfo, localFile, remoteFile, true);      // upload the file

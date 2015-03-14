@@ -11,6 +11,8 @@ namespace UploadContribution
 {
     class XferJobInfo
     {
+        private String[] files;
+
         public delegate void TransferCompleteHandler(object sender);
         public event TransferCompleteHandler OnCompleted;
         private DateTime startTime;
@@ -20,8 +22,7 @@ namespace UploadContribution
             get { return startTime; }
             set { 
                     startTime = value;
-                    FileInfo fInfo = new FileInfo(this.Source);             // calculate size at start of transfer
-                    fileSize = fInfo.Length;
+                    fileSize = GetSourceSize();
                 }
         }
         private DateTime endTime;
@@ -93,6 +94,34 @@ namespace UploadContribution
             set { ownerEmail = value; }
         }
 
+        public long GetSourceSize()
+        {
+            if (SourceIsDirectory())
+                return GetDirectorySize(this.Source);
+            else
+                return (new FileInfo(this.Source)).Length ;             // calculate size at start of transfer
+                
+        }
+
+        static long GetDirectorySize(string p)
+        {
+            // 1.
+            // Get array of all file names.
+            string[] a = Directory.GetFiles(p, "*.*", SearchOption.AllDirectories);
+            // 2.
+            // Calculate total bytes of all files in a loop.
+            long b = 0;
+            foreach (string name in a)
+            {
+                // 3.
+                // Use FileInfo to get length of each file.
+                FileInfo info = new FileInfo(name);
+                b += info.Length;
+            }
+            // 4.
+            // Return total size
+            return b;
+        }
         private string GetFileSize(double byteCount)
         {
             string size = "0 Bytes";
@@ -144,8 +173,66 @@ namespace UploadContribution
 
             Upload = true;
         }
+        public bool SourceIsDirectory()
+        {
+            return IsDirectory(this.Source);
+        }
 
-       
+        public static bool IsDirectory(string path)
+        {
+            System.IO.FileAttributes fa = System.IO.File.GetAttributes(path);
+            bool isDirectory = false;
+            if ((fa & FileAttributes.Directory) != 0)
+            {
+                isDirectory = true;
+            }
+            return isDirectory;
+        }
+
+        /// <summary>
+        ///  remove the file or the folder
+        /// </summary>
+        public void ClearSource()
+        {
+            if (SourceIsDirectory())
+            {
+                DirectoryInfo di = new DirectoryInfo(this.Source);
+                di.Delete(true);
+            }
+            else
+            {
+                File.Delete(this.Source);
+            }
+        }
+        public bool SourceExists()
+        {
+            if (IsDirectory(Source))
+                return Directory.Exists(Source);
+            else
+                return File.Exists(Source);
+        }
+
+        /// <summary>
+        ///  Count all files in the folder
+        /// </summary>
+        /// <returns></returns>
+        private int GetFiles()
+        {
+            files = Directory.GetFiles(this.Source, "*.*", SearchOption.AllDirectories);
+            return files.Length;
+        }
+        /// <summary>
+        /// Check if the number of files changed
+        /// </summary>
+        /// <returns></returns>
+        public bool MoreFiles()
+        {
+            int lastCount = files.Length;
+            int curCount = GetFiles();
+            return (lastCount < curCount);
+        }
+
+
         public static void XferFile(XferJobInfo xInfo)
         {
             string loginInfo = Program.Settings.LoginInfo;
@@ -163,19 +250,5 @@ namespace UploadContribution
        
     }
 
-    //class XferTask : Task
-    //{
-    //    public XferTask(Action act): Task(act)
-    //    {
-            
-    //    }
-    //    private XferJobInfo jobInfo;
-
-    //    public XferJobInfo JobInfo
-    //    {
-    //        get { return jobInfo; }
-    //        set { jobInfo = value; }
-    //    }
-
-    //}
+    
 }

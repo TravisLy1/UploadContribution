@@ -26,8 +26,7 @@ namespace UploadContribution
         private List<XferJobInfo> m_jobs;
         private List<XferJobInfo> m_jobQue;
         private Dictionary<String, String> m_files;               // List of files to be added to build wxi
-        
-
+        private String  productDestinationPath;
         private FileSystemWatcher m_watcher;
         public FormMain()
         {
@@ -37,7 +36,10 @@ namespace UploadContribution
             m_jobQue = new List<XferJobInfo>();
             m_files = new Dictionary<String, String>();
  
-            startWatching();
+            startWatching();   // watch in one folder
+
+           
+
             updateStatus();
             tsLabelDestination.Text = Program.DestinationFolder;
             tsLabelWatchFolder.Text = Program.WatchFolder;
@@ -45,74 +47,95 @@ namespace UploadContribution
             string ver = string.Format("{0} {1}", Assembly.GetExecutingAssembly().GetName().Name, Assembly.GetExecutingAssembly().GetName().Version);
             this.Text =  ver + " - " + m_machineName;
 
+            productDestinationPath = Program.DestinationFolder + "/Bundle/Products/";
             getFolderListToolStripMenuItem_Click(null, new EventArgs());
             
        }
 
+       
         /// <summary>
         /// Validate the name
         /// </summary>
         /// <param name="xInfo"></param>
         /// <returns></returns>
-        private bool ValidateFileNamingConvention(XferJobInfo xInfo)
-        {
-            string destinationFolder = FileNameMapping.CreateDestination(xInfo.Source);
-            string validateFolder = FileNameMapping.VerifyDestinationPath(destinationFolder);
-            string ownerEmail = FindOwnerEmail(Path.GetFullPath(xInfo.Source));
-            // Check the name of the file against the list of remote folders
-            // Findout the owner of the file
-            // Get the email address of the owner
-            if (String.IsNullOrEmpty(validateFolder))
-            {
-                // send an error email
-                string body = "Invalid Destination Path: " + destinationFolder + "\n\r";
-                body += "FileName = " + xInfo.Source;
+        //private bool ValidateFileNamingConvention(XferJobInfo xInfo)
+        //{
+        //    string destinationFolder = FileNameMapping.CreateDestination(xInfo.Source);
+        //    string validateFolder = FileNameMapping.VerifyDestinationPath(destinationFolder);
+        //    string ownerEmail = FindOwnerEmail(Path.GetFullPath(xInfo.Source));
+        //    // Check the name of the file against the list of remote folders
+        //    // Findout the owner of the file
+        //    // Get the email address of the owner
+        //    if (String.IsNullOrEmpty(validateFolder))
+        //    {
+        //        // send an error email
+        //        string body = "Invalid Destination Path: " + destinationFolder + "\n\r";
+        //        body += "FileName = " + xInfo.Source;
 
-                string subject = "UploadContribution ERROR";
-                if (!String.IsNullOrEmpty(ownerEmail))
-                    sendMail(subject, body, ownerEmail);
-                postErrorLog("ERROR", body, xInfo.Source);   // Always
-                addLine("ERROR: " + body, Color.Red);
-                return false;
-            }
-            else
-                return true;
-        }
+        //        string subject = "UploadContribution ERROR";
+        //        if (!String.IsNullOrEmpty(ownerEmail))
+        //            sendMail(subject, body, ownerEmail);
+        //        postErrorLog("ERROR", body, xInfo.Source);   // Always
+        //        addLine("ERROR: " + body, Color.Red);
+        //        return false;
+        //    }
+        //    else
+        //        return true;
+        //}
 
-    
         /// <summary>
-        /// When a new file is created, copied into this folder
+        /// Add more details to error Log
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void m_watcher_Created(object sender, FileSystemEventArgs e)
+        /// <param name="dest"></param>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        private String buildEmailMessage (string dest, string source)
         {
-            if (Path.GetExtension(e.Name) == ".log")
-                return;
-            if (IsDirectory(e.FullPath))
-                return;
+            // send an error email
+            string body = "Invalid Destination Path: " + dest + "\n" + "FileName = " + source + "\n\r";
+            body = body + "This Error was caused by an improper file name format or invalid destination folder on the file server\n\r";
+            // Add link to format page
+            body = body + "For formatting rules please see " ;
+            body = body + "https://toadjira.labs.dell.com/browse/CREQ-65\n\r";
+            body = body + "\nValid Destination Folders are\n";
+            // Add current directory
+            foreach (string f in FileNameMapping.FolderList)
+            {
+                body = body + "\t" + f + "\n";
+            }
 
-            string destinationFolder =  FileNameMapping.CreateDestination(e.Name);
+            return body;
+
+        }
+        /// <summary>
+        /// Add the file type to 
+        /// </summary>
+        /// <param name="e"></param>
+        void addFileToQueue(FileSystemEventArgs e)
+        {
+
+            string destinationFolder = FileNameMapping.CreateDestination(e.Name);
             string validateFolder = FileNameMapping.VerifyDestinationPath(destinationFolder);
 
-            string ownerEmail =  FindOwnerEmail(Path.GetFullPath(e.FullPath));
+            string ownerEmail = FindOwnerEmail(Path.GetFullPath(e.FullPath));
             // Check the name of the file against the list of remote folders
             // Findout the owner of the file
             // Get the email address of the owner
             if (String.IsNullOrEmpty(validateFolder))
             {
                 // send an error email
-                string body = "Invalid Destination Path: " + destinationFolder + "\n\r" + "FileName = " + e.FullPath;
+                string body = buildEmailMessage(destinationFolder, e.FullPath); // "Invalid Destination Path: " + destinationFolder + "\n\r" + "FileName = " + e.FullPath;
+                
                 string subject = "UploadContribution ERROR";
                 //if (!String.IsNullOrEmpty(ownerEmail))
                 sendMail(subject, body, ownerEmail);
                 postErrorLog(subject, body, e.FullPath);
-                addLine("ERROR: " + body, Color.Red);
+                addLine("ERROR: Invalid Destination Path: " + destinationFolder + "\n" + "FileName = " + e.FullPath, Color.Red);
             }
             else
             {
                 // Create destination by decoding the source File Name           
-                string destPath = Program.DestinationFolder + "/Products/" + validateFolder;
+                string destPath = productDestinationPath  + validateFolder;
 
                 // File may be started to created, but not completely copied
                 XferJobInfo xInfo = new XferJobInfo(e.FullPath, destPath);
@@ -123,23 +146,49 @@ namespace UploadContribution
                         m_jobQue.Add(xInfo);
                 }
                 addLine("Add to Queue: " + e.FullPath, Color.DarkBlue);
-               
+
                 timerTransfer.Interval = 5000;
                 timerTransfer.Start();
             }
             updateStatus();
+
         }
 
-        private static bool IsDirectory(string path)
+        void addFolderToQueue(FileSystemEventArgs e)
         {
-            System.IO.FileAttributes fa = System.IO.File.GetAttributes(path);
-            bool isDirectory = false;
-            if ((fa & FileAttributes.Directory) != 0)
+            string destPath = Program.DestinationFolder; // +"/" + e.Name;
+            // File may be started to created, but not completely copied
+            XferJobInfo xInfo = new XferJobInfo(e.FullPath, destPath);
+            xInfo.OwnerEmail = FindOwnerEmail(Path.GetFullPath(e.FullPath));
+            lock (m_jobQue)
             {
-                isDirectory = true;
+                if (m_jobQue.Find(x => x.Source == xInfo.Source) == null)
+                    m_jobQue.Add(xInfo);
             }
-            return isDirectory;
+            addLine("Add to Queue: " + e.FullPath, Color.DarkBlue);
+
+            timerTransfer.Interval = 5000;
+            timerTransfer.Start();
+            updateStatus();
         }
+        /// <summary>
+        /// When a new file is created, copied into this folder
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void m_watcher_Created(object sender, FileSystemEventArgs e)
+        {
+            if (Path.GetExtension(e.Name) == ".log")
+                return;
+            if (XferJobInfo.IsDirectory(e.FullPath))
+                addFolderToQueue(e);
+            else
+                addFileToQueue(e);
+
+            
+        }
+
+       
         /// <summary>
         /// Actual Transfer method, threaded
         /// </summary>
@@ -157,17 +206,23 @@ namespace UploadContribution
 
             lock(m_jobQue)
                 m_jobQue.Remove(xInfo);   // Move from Que to Jobs
-            if (File.Exists(xInfo.Source))
+
+
+            if (xInfo.SourceExists())
             {
                 if (!m_jobs.Contains(xInfo))
                         m_jobs.Add(xInfo);
-                // before transferring, need to look at the destination
-                if (Path.GetExtension(xInfo.Source) == ".msi")
+
+                if (!xInfo.SourceIsDirectory())
                 {
-                    addLine("Renaming Remote File at " + xInfo.Destination);
-                    FtpXfer ftp = new FtpXfer();
-                    ftp.renameMSIFile(xInfo.Destination, Path.GetFileName(xInfo.Source));
-                    addLine(ftp.LastStatus);
+                    // before transferring, need to look at the destination
+                    if (Path.GetExtension(xInfo.Source) == ".msi")
+                    {
+                        addLine("Renaming Remote File at " + xInfo.Destination);
+                        FtpXfer ftp = new FtpXfer();
+                        ftp.renameMSIFile(xInfo.Destination, Path.GetFileName(xInfo.Source));
+                        addLine(ftp.LastStatus);
+                    }
                 }
                 addLine("Transfering: " + xInfo.Source + " to " + xInfo.Destination, Color.Blue);
                 xInfo.OnCompleted += OnTransferCompleted;
@@ -255,24 +310,28 @@ namespace UploadContribution
                      addLine(xInfo.ConsoleOutput);
 
                 addLine(xInfo.Source + " uploaded successfully", Color.DarkGreen);
-                string body = "File " + xInfo.Source + " uploaded successfully!" + "\r\n";
+                string body = xInfo.Source + " uploaded successfully!" + "\r\n";
                 sendMail("UploadContribution - File Uploaded Sucessfully", body, xInfo.OwnerEmail);
-                // Add to list of files to be used for update build file ONLY if it's an MSI file
-                string ext = Path.GetExtension(xInfo.Source);
-                if (!String.IsNullOrEmpty(ext) && (string.Compare(ext, ".msi", true) == 0))
+                if (!xInfo.SourceIsDirectory())
                 {
-                    // keep track of the files to be added to the build file
-                    string destFolder = FileNameMapping.CreateDestination(xInfo.Source);
-                    destFolder = FileNameMapping.VerifyDestinationPath(destFolder);     // Get verified folder name
-                    if (!m_files.ContainsKey(destFolder))
-                        m_files.Add(destFolder, Path.GetFileName(xInfo.Source));
-                    else
-                        m_files[destFolder] = xInfo.Source;
+                    // Add to list of files to be used for update build file ONLY if it's an MSI file
+                    string ext = Path.GetExtension(xInfo.Source);
+                    if (!String.IsNullOrEmpty(ext) && (string.Compare(ext, ".msi", true) == 0))
+                    {
+                        // keep track of the files to be added to the build file
+                        string destFolder = FileNameMapping.CreateDestination(xInfo.Source);
+                        destFolder = FileNameMapping.VerifyDestinationPath(destFolder);     // Get verified folder name
+                        if (!m_files.ContainsKey(destFolder))
+                            m_files.Add(destFolder, Path.GetFileName(xInfo.Source));
+                        else
+                            m_files[destFolder] = xInfo.Source;
+                    }
                 }
+
+
                 try
                 {
-                     // Delete file if return code is 0 
-                    File.Delete(xInfo.Source);
+                    xInfo.ClearSource();
                 }
                 catch (Exception ex)
                 {
@@ -394,8 +453,6 @@ namespace UploadContribution
         /// <returns></returns>
         private bool IsLocked(string fileName)
         {
-            
-
             try
             {
                 Stream s = new FileStream(fileName, FileMode.Open);
@@ -425,9 +482,22 @@ namespace UploadContribution
 
             }
         }
+        /// <summary>
+        /// Monitor any changes to the folder
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void folderContent_Changed(object sender, FileSystemEventArgs e)
+        {
+            // if folder changed, rsync the entire content.  But need to check the files that changed to see if they are accessible
+            if (e.ChangeType == WatcherChangeTypes.Created)
+            {
+                
 
-       
+            }
 
+        }
+        
         private void startWatching()
         {
             // start watch folder
@@ -440,12 +510,12 @@ namespace UploadContribution
                 m_watcher.Created += m_watcher_Created;
             
                 m_watcher.EnableRaisingEvents = true;
-                addLine("Monitor " + Program.WatchFolder);
+                addLine("Monitoring " + Program.WatchFolder + " for contributions...");
                 
             }
             else
             {
-                addLine(Program.WatchFolder + " Does not exist!");
+                addLine(Program.WatchFolder + " Does not exist! Not monitoring, please check path and restart program");
             }
         }
 
@@ -676,8 +746,8 @@ namespace UploadContribution
         {
             addLine("Retrieving Folder Information...", Color.Blue);
             FtpXfer ftp = new FtpXfer();
-            string destPath = Program.DestinationFolder + "/Products/";
-            FileNameMapping.FolderList = ftp.GetFolderList(destPath);
+           
+            FileNameMapping.FolderList = ftp.GetFolderList(productDestinationPath);
             FileNameMapping.FolderList.Sort();
             if (!String.IsNullOrEmpty(ftp.LastStatus))
                 addLine("Ftp Error: " + ftp.LastStatus);
@@ -752,7 +822,11 @@ namespace UploadContribution
         {
             string fileName = tsTestText.Text;
             addLine("Folder = " +  FileNameMapping.CreateDestination(fileName));
-        }        
+        }
+
+       
+
+     
 
     }
 }

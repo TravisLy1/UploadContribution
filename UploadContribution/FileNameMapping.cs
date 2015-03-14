@@ -49,7 +49,7 @@ namespace UploadContribution
             if (match.Success)
                 return match.Groups[0].Value;
             else
-                return GetVersionModifier(path);
+                return "";
         }
         /// <summary>
         /// Ther may be modifiers

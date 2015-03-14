@@ -100,14 +100,14 @@
             // tagFileToolStripMenuItem
             // 
             this.tagFileToolStripMenuItem.Name = "tagFileToolStripMenuItem";
-            this.tagFileToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            this.tagFileToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.tagFileToolStripMenuItem.Text = "Tag File";
             this.tagFileToolStripMenuItem.Click += new System.EventHandler(this.tagFileToolStripMenuItem_Click);
             // 
             // buildFileToolStripMenuItem
             // 
             this.buildFileToolStripMenuItem.Name = "buildFileToolStripMenuItem";
-            this.buildFileToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            this.buildFileToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.buildFileToolStripMenuItem.Text = "Build File";
             this.buildFileToolStripMenuItem.Click += new System.EventHandler(this.buildFileToolStripMenuItem_Click);
             // 

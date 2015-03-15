@@ -17,8 +17,8 @@ using System.DirectoryServices;
 
 namespace UploadContribution
 {
-    
-    public partial class FormMain : Form
+
+    public partial class FormMain : Form, FormReport
     {
         private string m_machineName;
 
@@ -40,7 +40,7 @@ namespace UploadContribution
 
            
 
-            updateStatus();
+            updateStatus("");
             tsLabelDestination.Text = Program.DestinationFolder;
             tsLabelWatchFolder.Text = Program.WatchFolder;
             m_machineName = Environment.MachineName;
@@ -150,16 +150,67 @@ namespace UploadContribution
                 timerTransfer.Interval = 5000;
                 timerTransfer.Start();
             }
-            updateStatus();
+            updateStatus("add to queue");
 
         }
 
+
+        private FileSystemWatcher folderWatch;
+        int changeCount = 0;
+        /// <summary>
+        /// Add the folder to the queue, but first make sure it stop changing
+        /// </summary>
+        /// <param name="e"></param>
         void addFolderToQueue(FileSystemEventArgs e)
         {
             string destPath = Program.DestinationFolder; // +"/" + e.Name;
             // File may be started to created, but not completely copied
             XferJobInfo xInfo = new XferJobInfo(e.FullPath, destPath);
             xInfo.OwnerEmail = FindOwnerEmail(Path.GetFullPath(e.FullPath));
+
+            timerTransfer.Interval = 5000;      // 5 secs
+          
+            updateStatus("Add Folder to queue");
+
+            folderWatch = new FileSystemWatcher(xInfo.Source);
+            
+            folderWatch.EnableRaisingEvents = true;
+            folderWatch.NotifyFilter = NotifyFilters.LastWrite;
+            folderWatch.IncludeSubdirectories = true;
+            folderWatch.Changed += (sender, ex) =>
+            {
+
+                timerTransfer.Stop();
+                timerTransfer.Enabled = false;
+                
+                lock (xInfo)
+                {
+                    // Get the time the file was modified
+                    // Check it again in 100 ms
+                    // When it has gone a while without modification, it's done.
+
+                    changeCount++;
+                    
+                    if (!XferJobInfo.IsDirectory(ex.FullPath))
+                    {
+                            updateStatus(e.ChangeType.ToString() + " # of events = " + changeCount.ToString() + ", file count = " + xInfo.GetFileCount());
+                            addLine(ex.FullPath);
+                          
+                    }
+                }
+
+                timerTransfer.Interval = 5000;      // 5 secs
+                timerTransfer.Start();
+                timerTransfer.Enabled = true;
+              
+            };
+
+            
+            
+            // should wait for the file before start this
+
+
+
             lock (m_jobQue)
             {
                 if (m_jobQue.Find(x => x.Source == xInfo.Source) == null)
@@ -167,11 +218,13 @@ namespace UploadContribution
             }
             addLine("Add to Queue: " + e.FullPath, Color.DarkBlue);
 
-            timerTransfer.Interval = 5000;
+            timerTransfer.Interval = 5000;      // 5 secs
             timerTransfer.Start();
-            updateStatus();
+            updateStatus("Add Folder to queue");
         }
-        /// <summary>
+
+      
+          /// <summary>
         /// When a new file is created, copied into this folder
         /// </summary>
         /// <param name="sender"></param>
@@ -180,11 +233,14 @@ namespace UploadContribution
         {
             if (Path.GetExtension(e.Name) == ".log")
                 return;
-            if (XferJobInfo.IsDirectory(e.FullPath))
-                addFolderToQueue(e);
-            else
-                addFileToQueue(e);
+            if (!XferJobInfo.IsDirectory(e.FullPath))
+                  addFileToQueue(e);
 
+
+            //    addFolderToQueue(e);
+            //else
+            //    addFileToQueue(e);
+            
             
         }
 
@@ -195,15 +251,20 @@ namespace UploadContribution
         /// <param name="xInfo"></param>
         private void doTransfer(XferJobInfo xInfo)
         {
-            //if (IsLocked(xInfo.Source) )
-            //    return;          // File is lockec cannot transfer
-            string ext = Path.GetExtension(xInfo.Source);
-            if (!String.IsNullOrEmpty(ext) && (string.Compare(ext, ".msi", true) == 0))
-            {   // Check for lock on MSI file only, HTML should not have an issue
-                if (FileUtil.IsFileLocked(xInfo.Source, 3))
+            addLine(xInfo.Source  + ". File Count = " + xInfo.GetFileCount());
+            if (xInfo.SourceIsDirectory())
+            {
+                if (xInfo.MoreFiles())      // Still copying files
+                {
                     return;
+                }
             }
 
+            if (xInfo.SourceIsLocked())
+            {
+                addLine(xInfo.Source + " is locked");
+                return;
+            }
             lock(m_jobQue)
                 m_jobQue.Remove(xInfo);   // Move from Que to Jobs
 
@@ -226,11 +287,11 @@ namespace UploadContribution
                 }
                 addLine("Transfering: " + xInfo.Source + " to " + xInfo.Destination, Color.Blue);
                 xInfo.OnCompleted += OnTransferCompleted;
-
+                xInfo.OnTransferStatus += xInfo_OnTransferStatus;
                 Action doUpload = () => XferJobInfo.XferFile(xInfo);
                 Task t = new Task(doUpload);
                 t.Start();
-                updateStatus();
+                updateStatus("transferring...");
             }
             else
             {
@@ -240,6 +301,11 @@ namespace UploadContribution
             }
             
             
+        }
+
+        void xInfo_OnTransferStatus(object sender, string msg)
+        {
+            addLine(msg);
         }
 
         /// <summary>
@@ -381,7 +447,7 @@ namespace UploadContribution
                     postErrorLog("UploadContribution - File Uploaded FAILURE", body, xInfo.Source);
                 }
             }          
-            updateStatus();
+            updateStatus("transfer completed..");
         }
 
         private void updateVersionInfo(string path)
@@ -445,44 +511,106 @@ namespace UploadContribution
             }
         }
 
+        //void BlockingFileCopySync(FileInfo copyPath)
+        //{
+        //    bool ready = false;
+
+        //    FileSystemWatcher watcher = new FileSystemWatcher();
+        //    watcher.NotifyFilter = NotifyFilters.LastWrite;
+        //    watcher.Path = copyPath.Directory.FullName;
+        //    watcher.Filter = "*" + copyPath.Extension;
+        //    watcher.EnableRaisingEvents = true;
+
+        //    bool fileReady = false;
+        //    bool firsttime = true;
+        //    DateTime previousLastWriteTime = new DateTime();
+
+        //    // modify this as you think you need to...
+        //    int waitTimeMs = 100;
+
+        //    watcher.Changed += (sender, e) =>
+        //    {
+        //        // Get the time the file was modified
+        //        // Check it again in 100 ms
+        //        // When it has gone a while without modification, it's done.
+        //        while (!fileReady)
+        //        {
+        //            // We need to initialize for the "first time", 
+        //            // ie. when the file was just created.
+        //            // (Really, this could probably be initialized off the
+        //            // time of the copy now that I'm thinking of it.)
+        //            if (firsttime)
+        //            {
+        //                previousLastWriteTime = System.IO.File.GetLastWriteTime(copyPath.FullName);
+        //                firsttime = false;
+        //                System.Threading.Thread.Sleep(waitTimeMs);
+        //                continue;
+        //            }
+
+        //            DateTime currentLastWriteTime = System.IO.File.GetLastWriteTime(copyPath.FullName);
+
+        //            bool fileModified = (currentLastWriteTime != previousLastWriteTime);
+
+        //            if (fileModified)
+        //            {
+        //                previousLastWriteTime = currentLastWriteTime;
+        //                System.Threading.Thread.Sleep(waitTimeMs);
+        //                continue;
+        //            }
+        //            else
+        //            {
+        //                fileReady = true;
+        //                break;
+        //            }
+        //        }
+        //    };
+
+        
+        //    // This guy here chills out until the filesystemwatcher 
+        //    // tells him the file isn't being writen to anymore.
+        //    while (!fileReady)
+        //    {
+        //        System.Threading.Thread.Sleep(waitTimeMs);
+        //    }
+        //}
         /// <summary>
         /// Open a file and catch the exception.
         /// If the file is not ready to be opened, it's still being copied.
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        private bool IsLocked(string fileName)
-        {
-            try
-            {
-                Stream s = new FileStream(fileName, FileMode.Open);
-                s.Close();
+        //private bool IsLocked(string fileName)
+        //{
+        //    try
+        //    {
+        //        Stream s = new FileStream(fileName, FileMode.Open);
+        //        s.Close();
                 
-                return false;
-            }
-            catch
-            {
-                // Findout who is locking
-                List<Process> procs = FileUtil.WhoIsLocking(fileName);
-                foreach (Process p in procs)
-                {
-                    addLine(fileName + " locked by " + p.ToString() + " - " + p.Handle);
-                }
+        //        return false;
+        //    }
+        //    catch
+        //    {
+        //        // Findout who is locking
+        //        List<Process> procs = FileUtil.WhoIsLocking(fileName);
+        //        foreach (Process p in procs)
+        //        {
+        //            addLine(fileName + " locked by " + p.ToString() + " - " + p.Handle);
+        //        }
 
-                if (File.Exists(fileName))
-                {
-                    return true;
-                }
-                else
-                {
-                    // Need to remove from Queue
-                    addLine("File " + fileName + " is missing!  Must have been removed or drop was cancelled.");
-                    return false;
-                }
+        //        if (File.Exists(fileName))
+        //        {
+        //            return true;
+        //        }
+        //        else
+        //        {
+        //            // Need to remove from Queue
+        //            addLine("File " + fileName + " is missing!  Must have been removed or drop was cancelled.");
+        //            return false;
+        //        }
 
-            }
-        }
-        /// <summary>
+        //    }
+        //}
+        ///// <summary>
         /// Monitor any changes to the folder
         /// </summary>
         /// <param name="sender"></param>
@@ -532,18 +660,19 @@ namespace UploadContribution
             }
         }
 
-        private delegate void UpdateStatusCallBack();
-        private void updateStatus()
+        private delegate void UpdateStatusCallBack(string message);
+        private void updateStatus(string message)
         {
             if (InvokeRequired)
             {
                 UpdateStatusCallBack u = new UpdateStatusCallBack(updateStatus);
-                this.BeginInvoke(u);
+                this.BeginInvoke(u, message);
             }
             else
             {
                 tsTextTodos.Text = m_jobQue.Count.ToString(); // m_todoFiles.Count.ToString();
                 tsTextTransferring.Text = m_jobs.Count.ToString();
+                toolStatusText.Text = message;
             }
         }
 
@@ -588,7 +717,7 @@ namespace UploadContribution
         /// of data become too large, trim text when it reaches a certain size.
         /// </summary>
         /// <param name="text"></param>
-        private void AppendTrace(RichTextBox rtb, string text, Color textcolor)
+        public static void AppendTrace(RichTextBox rtb, string text, Color textcolor)
         {
             // keep textbox trimmed and avoid overflow
             // when kiosk has been running for awhile

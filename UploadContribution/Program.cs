@@ -8,9 +8,14 @@ using System.IO;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Drawing;
 
 namespace UploadContribution
 {
+    public interface FormReport
+    {
+        void addLine(string line, Color? c = null, bool? notime = false);
+    }
     static class Program
     {
        // public static string LoginInfo;
@@ -20,9 +25,10 @@ namespace UploadContribution
         public static string WorkingDir;
         public static string TransferLog;
         public static string LocalTagFile;
-      
+        public static FormReport Report;
+
         public static string RsyncResult;
-        public static FormMain mainForm;
+        //public static FormMain mainForm;
         private static UploadContribution.Properties.Settings settings;
 
         public static UploadContribution.Properties.Settings Settings
@@ -50,28 +56,43 @@ namespace UploadContribution
             FtpXfer.FtpPwd = Settings.FtpPwd;
             FtpXfer.HostFingerPrint = Settings.HostFingerPrint;
 
-            // arg0 - watch folder
-            // arg1 - destination folder
-            if (args.Length < 2)
-            {
-               
-                // Usage message
-                string msg = string.Format("{0} {1}", Assembly.GetExecutingAssembly().GetName().Name,
-                                  "<monitor folder> <destination path> ");
-                MessageBox.Show(msg);
-                Environment.Exit(2);
-            }
-            WatchFolder = args[0];
-            DestinationFolder = args[1];
-            // exract the product family from the folder path 
-            DirectoryInfo di = new DirectoryInfo(WatchFolder);
-            ProductFamily = di.Name;
-
- 
+            Form f;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            mainForm = new FormMain();
-            Application.Run(mainForm);
+           
+
+            // 3 arguments go to Sync Page  
+            if (args.Length > 2)
+            {
+                WatchFolder = args[0];
+                DestinationFolder = args[1];
+                f = new FolderSync();
+                Program.Settings.Verbose = false;
+            }
+            else
+            {
+                // arg0 - watch folder
+                // arg1 - destination folder
+                if (args.Length < 2)
+                {
+
+                    // Usage message
+                    string msg = string.Format("{0} {1}", Assembly.GetExecutingAssembly().GetName().Name,
+                                      "<monitor folder> <destination path> ");
+                    MessageBox.Show(msg);
+                    Environment.Exit(2);
+                }
+                WatchFolder = args[0];
+                DestinationFolder = args[1];
+                // exract the product family from the folder path 
+                DirectoryInfo di = new DirectoryInfo(WatchFolder);
+                ProductFamily = di.Name;
+                Program.Settings.Verbose = true;
+                f = new FormMain();
+            }
+
+            Report = (FormReport) f;
+            Application.Run(f);
         }
 
         public static string GetFileOwner(string path)
@@ -169,7 +190,7 @@ namespace UploadContribution
             while ((status != 0) && (retry-- > 0))
             {
                 status = RunRSync(Program.Settings.LoginInfo, remotetagFile, LocalTagFile, false);
-                mainForm.addLine(RsyncResult);
+                Report.addLine(RsyncResult);
             }
             return status;
         }
@@ -192,7 +213,7 @@ namespace UploadContribution
             while ((status != 0) && (retry-- > 0))
             {
                 status = RunRSync(Program.Settings.LoginInfo, localTagFile, remotetagFile, true);      // upload the file
-                mainForm.addLine(RsyncResult);
+                Report.addLine(RsyncResult);
             }
             return status;
         }
@@ -212,7 +233,7 @@ namespace UploadContribution
             while ((status != 0) && (retry-- > 0))
             {
                 status =  RunRSync(Program.Settings.LoginInfo, remoteFile, localFile, false);
-                mainForm.addLine(RsyncResult);
+                Report.addLine(RsyncResult);
             }
             if (status == 0)
                 return localFile;
@@ -244,7 +265,7 @@ namespace UploadContribution
             while ((status != 0) && (retry-- > 0))
             {
                 status = RunRSync(Program.Settings.LoginInfo, localFile, remoteFile, true);      // upload the file
-                mainForm.addLine(RsyncResult);
+                Report.addLine(RsyncResult);
             }
             return status;
         }
@@ -260,7 +281,7 @@ namespace UploadContribution
             while ((status != 0) && (retry-- > 0))
             {
                 status = RunRSync(Program.Settings.LoginInfo, localFile, remoteFile, true);      // upload the file
-                mainForm.addLine(RsyncResult);
+                Report.addLine(RsyncResult);
             }
             return status;
         }
@@ -283,8 +304,8 @@ namespace UploadContribution
             // rsync -avz  -r --progress -e "ssh -i /cygdrive/c/sshKey/rsyncKey" "/cygdrive/c/temp" "suite@fileserver.skytapbuilddb.local:/home/suite/temp2/"
             ProcessStartInfo info = new ProcessStartInfo("rsync.exe");
             RsyncResult = "";
-            info.RedirectStandardOutput = true; // m_settings.Verbose;
-            
+            info.RedirectStandardOutput =  Program.Settings.Verbose;
+                
             Uri uri = new Uri(Assembly.GetExecutingAssembly().CodeBase);
             info.WorkingDirectory = Path.GetDirectoryName(uri.LocalPath);
            

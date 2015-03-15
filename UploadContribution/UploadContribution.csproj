@@ -53,6 +53,12 @@
   <ItemGroup>
     <Compile Include="FileNameMapping.cs" />
     <Compile Include="FileUtil.cs" />
+    <Compile Include="FolderSync.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FolderSync.Designer.cs">
+      <DependentUpon>FolderSync.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -63,6 +69,9 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="XferJobInfo.cs" />
+    <EmbeddedResource Include="FolderSync.resx">
+      <DependentUpon>FolderSync.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
     </EmbeddedResource>

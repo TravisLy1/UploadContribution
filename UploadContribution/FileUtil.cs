@@ -154,7 +154,7 @@ namespace UploadContribution
             {
                 try
                 {
-                    using (File.Open(filePath, FileMode.Open)) { }
+                    using (File.Open(filePath, FileMode.Open, FileAccess.Write)) { }
                     return false;
                 }
                 catch (IOException e)

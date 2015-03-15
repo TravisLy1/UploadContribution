@@ -11,10 +11,17 @@ namespace UploadContribution
 {
     class XferJobInfo
     {
+        public static int CheckTime = 100;
         private String[] files;
+ 
+     
+
 
         public delegate void TransferCompleteHandler(object sender);
         public event TransferCompleteHandler OnCompleted;
+        public delegate void TransferStatusHandler(object sender, String msg);
+        public event TransferStatusHandler OnTransferStatus;
+
         private DateTime startTime;
 
         public DateTime StartTime
@@ -165,9 +172,14 @@ namespace UploadContribution
             returnCode = -1;
             upload = true;
             fileSize = 0;
+           
         }
-        public XferJobInfo(string src, string dest):base()
+        public XferJobInfo(string src, string dest)
         {
+            retryCount = 0;
+            returnCode = -1;
+            upload = true;
+            fileSize = 0;
             Source = src;
             Destination = dest;
 
@@ -216,10 +228,24 @@ namespace UploadContribution
         ///  Count all files in the folder
         /// </summary>
         /// <returns></returns>
-        private int GetFiles()
+        public int GetFileCount()
         {
-            files = Directory.GetFiles(this.Source, "*.*", SearchOption.AllDirectories);
-            return files.Length;
+            if (SourceIsDirectory())
+            {
+                try
+                {
+                    files = Directory.GetFiles(this.Source, "*.*", SearchOption.AllDirectories);
+                }
+                catch (Exception)
+                {
+
+                }
+               
+                return files.Length;
+                
+            }
+            else
+                return 1;
         }
         /// <summary>
         /// Check if the number of files changed
@@ -228,11 +254,173 @@ namespace UploadContribution
         public bool MoreFiles()
         {
             int lastCount = files.Length;
-            int curCount = GetFiles();
+            int curCount = GetFileCount();
             return (lastCount < curCount);
         }
 
+        DateTime[] previousWriteTimes;
+        /// <summary>
+        /// Wait for files to be completely copied
+        /// </summary>
+        public void WaitforFiles()
+        {
+            if (SourceIsDirectory())
+            {
+                // First time read the time
+              
+                bool done = false;
+                //int lastFileCompleted = 0;
+                
+                while (!done)
+                {
+                    previousWriteTimes = new DateTime[files.Length];
 
+                    // read the first set of times 
+                    for (int i = 0; i < files.Length; i++)
+                        previousWriteTimes[i] = System.IO.File.GetLastWriteTime(files[i]);
+                    
+                    // wait for a bit
+                    System.Threading.Thread.Sleep(CheckTime);
+                    // check again
+                    // First time read the time
+                    for (int i = 0; i < files.Length; i++)
+                    {
+                        DateTime lastWriteTime = System.IO.File.GetLastWriteTime(files[i]);
+                       
+                        //lastFileCompleted = i;  /// save the index
+ 
+                        if (lastWriteTime != previousWriteTimes[i])
+                        {
+                            OnTransferStatus(this, "Wait for " + files[i]);
+                           // wait for the file
+                            WaitforFile(files[i]);
+                        }
+                    }
+                   
+                    // check to see if are different number of files since last time
+                    if (!MoreFiles())
+                        done = true;
+                }
+
+            }
+            else
+            {
+                WaitforFile(this.source);
+            }
+        }
+
+
+        /// <summary>
+        /// Loop here and wait for the file
+        /// </summary>
+        /// <param name="path"></param>
+        public void WaitforFile(string path)
+        {
+            bool fileReady = false;
+          
+            DateTime previousWriteTime = System.IO.File.GetLastWriteTime(path);
+            while(!fileReady)
+            {
+                System.Threading.Thread.Sleep(CheckTime);
+                DateTime currentWriteTime = System.IO.File.GetLastWriteTime(path);
+                if (previousWriteTime != currentWriteTime)     // still changing
+                {
+                    previousWriteTime = currentWriteTime;
+                    OnTransferStatus(this, "Waiting for " + path);
+                    continue;
+                }
+                else
+                {
+                    fileReady = true;       // Done
+                }
+            }
+        }
+
+        /// <summary>
+        /// Non blocking check if any all files are ready, copying is done
+        /// </summary>
+        /// <returns></returns>
+        private bool filesAreReady()
+        {
+            bool isReady = false;
+            bool fileModified = true;
+            int readyCnt = 0;
+            if (SourceIsDirectory())
+            {
+                previousWriteTimes = new DateTime[files.Length];
+                // First time read the time
+                for (int i = 0; i < files.Length; i++)
+                {
+                    previousWriteTimes[i] = System.IO.File.GetLastWriteTime(files[i]);
+                }
+                // wait for a bit
+                System.Threading.Thread.Sleep(CheckTime);
+                // check again
+                // First time read the time
+                fileModified = false;
+                readyCnt = 0;
+                for (int i = 0; i < files.Length; i++)
+                {
+                    DateTime lastWriteTime = System.IO.File.GetLastWriteTime(files[i]);
+                    fileModified = (lastWriteTime != previousWriteTimes[i]);
+                    if (fileModified)
+                    {
+                        readyCnt = i;
+                        break;
+                    }
+                }
+                isReady = !fileModified;
+
+            }
+            else
+            {
+
+                DateTime lastWriteTime = System.IO.File.GetLastWriteTime(this.Source);
+                System.Threading.Thread.Sleep(100);
+            }
+
+            OnTransferStatus(this, readyCnt.ToString() + " ready out of " + files.Length.ToString());
+            return isReady;
+        }
+
+
+        /// <summary>
+        /// Check if any of the source is locked
+        /// </summary>
+        /// <returns></returns>
+        public bool SourceIsLocked()
+        {
+            // if directory, check all files
+            if (SourceIsDirectory())
+            {
+                // get more files
+                MoreFiles();
+                foreach (string fileName in files)
+                {
+                    if (FileUtil.IsFileLocked(fileName, 10))
+                        return true;
+                }
+            }
+            else
+            {
+                //if (IsLocked(xInfo.Source) )
+                //    return;          // File is lockec cannot transfer
+                string ext = Path.GetExtension(this.Source);
+                if (!String.IsNullOrEmpty(ext) && (string.Compare(ext, ".msi", true) == 0))
+                {   // Check for lock on MSI file only, HTML should not have an issue
+                    return (FileUtil.IsFileLocked(this.Source, 3));
+                }
+               
+            }
+            return false;       // None of the file is locked
+
+        }
+
+        /// <summary>
+        /// transfer file is called in a separate thread to execute the rsync,  it may need to loop and wait for the file to finish copy
+        /// 
+        /// </summary>
+        /// <param name="xInfo"></param>
         public static void XferFile(XferJobInfo xInfo)
         {
             string loginInfo = Program.Settings.LoginInfo;
@@ -240,6 +428,10 @@ namespace UploadContribution
             string destinationPath = xInfo.Destination;
             bool upload = xInfo.Upload;
 
+            // Wait for all files to be copied completely
+            //xInfo.WaitforFiles();
+
+            // This is to run asyc
             xInfo.StartTime = DateTime.Now;
             xInfo.ReturnCode = Program.RunRSync(loginInfo, sourcePath, destinationPath, upload);
             xInfo.ConsoleOutput = Program.RsyncResult;

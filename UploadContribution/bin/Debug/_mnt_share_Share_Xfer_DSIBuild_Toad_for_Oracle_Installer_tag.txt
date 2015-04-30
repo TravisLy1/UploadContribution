@@ -1,0 +1,5 @@
+
+3/16/2015 1:23:34 PM, c:\dropfolder\Oracle\SQLOptimizerForOracle_8.9.0.3012_x86_multilang.msi, /mnt/share/Share/Xfer/DSIBuild/Toad_for_Oracle_Installer/Data/Products/SQLOptimizerForOracle_x86_multilang, 81.83 MB, 3/16/2015 1:23:50 PM, 16 secs, 5.11 MB/sec, ALVTLY
+3/16/2015 4:56:35 PM, \\alv3vb0ph1\pobox\installer\, /mnt/share/Share/Xfer/DSIBuild/Toad_for_Oracle_Installer/, 2.02 GB, 3/16/2015 5:10:31 PM, 835 secs, 2.47 MB/sec, ALVTLY
+3/16/2015 10:41:03 PM, \\alv3vb0ph1\pobox\installer\, /mnt/share/Share/Xfer/DSIBuild/Toad_for_Oracle_Installer/, 2.01 GB, 3/16/2015 10:49:30 PM, 506 secs, 4.07 MB/sec, ALVTLY
+3/17/2015 3:06:49 PM, \\alv3vb0ph1\pobox\installer\, /mnt/incoming/Share/DSIBuild/Toad_for_Oracle_Installer/, 2.01 GB, 3/17/2015 3:15:33 PM, 523 secs, 3.94 MB/sec, ALVTLY

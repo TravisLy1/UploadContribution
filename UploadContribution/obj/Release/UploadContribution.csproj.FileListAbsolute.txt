@@ -1,0 +1,10 @@
+C:\dev\UploadContribution\UploadContribution\bin\Release\UploadContribution.exe.config
+C:\dev\UploadContribution\UploadContribution\bin\Release\UploadContribution.exe
+C:\dev\UploadContribution\UploadContribution\bin\Release\UploadContribution.pdb
+C:\dev\UploadContribution\UploadContribution\bin\Release\WinSCPnet.dll
+C:\dev\UploadContribution\UploadContribution\obj\Release\UploadContribution.csprojResolveAssemblyReference.cache
+C:\dev\UploadContribution\UploadContribution\obj\Release\UploadContribution.FormMain.resources
+C:\dev\UploadContribution\UploadContribution\obj\Release\UploadContribution.Properties.Resources.resources
+C:\dev\UploadContribution\UploadContribution\obj\Release\UploadContribution.csproj.GenerateResource.Cache
+C:\dev\UploadContribution\UploadContribution\obj\Release\UploadContribution.exe
+C:\dev\UploadContribution\UploadContribution\obj\Release\UploadContribution.pdb

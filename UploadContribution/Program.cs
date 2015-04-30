@@ -185,7 +185,7 @@ namespace UploadContribution
             int status = -1;
             int retry = Program.settings.TransferMaxRetries;
             //productDestinationPath = Program.DestinationFolder + "/Bundle/
-            string remotetagFile = Program.DestinationFolder + "/Bundle/tag.txt";
+            string remotetagFile = Program.DestinationFolder + "/Data/tag.txt";
             LocalTagFile = GetTagFileName("tag.txt");//WorkingDir + @"\tag.txt";
             while ((status != 0) && (retry-- > 0))
             {
@@ -203,7 +203,7 @@ namespace UploadContribution
         {
             int status = -1;
             int retry = Program.settings.TransferMaxRetries;
-            string remotetagFile = Program.DestinationFolder + "/Bundle/tag.txt";
+            string remotetagFile = Program.DestinationFolder + "/Data/tag.txt";
             string localTagFile = GetTagFileName("tag.txt");
             // Need to add to the file
             // Append the Transfer Log
@@ -227,7 +227,7 @@ namespace UploadContribution
         {
             int status = -1;
             int retry = Program.settings.TransferMaxRetries;
-            string remoteFile = Program.DestinationFolder + "/Bundle/PackageNames.wxi";
+            string remoteFile = Program.DestinationFolder + "/Data/Products/PackageNames.wxi";
             string localFile = GetTagFileName("PackageNames.wxi");
 
             while ((status != 0) && (retry-- > 0))
@@ -247,7 +247,7 @@ namespace UploadContribution
         /// <returns></returns>
         public static string GetVersionFile()
         {
-            string remoteFile = Program.DestinationFolder + "/Bundle/versionInfo.txt";
+            string remoteFile = Program.DestinationFolder + "/Data/versionInfo.txt";
             string localFile = GetTagFileName("versionInfo.txt");
             return localFile;
         }
@@ -261,7 +261,7 @@ namespace UploadContribution
         {
             int status = -1;
             int retry = Program.settings.TransferMaxRetries;
-            string remoteFile = Program.DestinationFolder + "/Bundle/versionInfo.txt";
+            string remoteFile = Program.DestinationFolder + "/Data/versionInfo.txt";
             while ((status != 0) && (retry-- > 0))
             {
                 status = RunRSync(Program.Settings.LoginInfo, localFile, remoteFile, true);      // upload the file
@@ -277,7 +277,7 @@ namespace UploadContribution
         {
             int status = -1;
             int retry = Program.settings.TransferMaxRetries;
-            string remoteFile = Program.DestinationFolder + "/Bundle/PackageNames.wxi";
+            string remoteFile = Program.DestinationFolder + "/Data/Products/PackageNames.wxi";
             while ((status != 0) && (retry-- > 0))
             {
                 status = RunRSync(Program.Settings.LoginInfo, localFile, remoteFile, true);      // upload the file

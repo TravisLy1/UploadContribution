@@ -18,7 +18,7 @@ namespace UploadContribution
         {
             InitializeComponent();
             // fill up the text box
-            textDestinationFolder.Text = Program.Settings.DestinationPath;
+            textDestinationFolder.Text = Program.Settings.DestinationPath + "/";
             textSourceFolder.Text = Program.Settings.SourceFolder;
 
         }

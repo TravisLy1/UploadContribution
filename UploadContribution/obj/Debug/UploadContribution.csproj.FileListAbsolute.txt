@@ -8,3 +8,4 @@ C:\dev\UploadContribution\UploadContribution\obj\Debug\UploadContribution.pdb
 C:\dev\UploadContribution\UploadContribution\obj\Debug\UploadContribution.FormMain.resources
 C:\dev\UploadContribution\UploadContribution\bin\Debug\WinSCPnet.dll
 C:\dev\UploadContribution\UploadContribution\obj\Debug\UploadContribution.csprojResolveAssemblyReference.cache
+C:\dev\UploadContribution\UploadContribution\obj\Debug\UploadContribution.FolderSync.resources

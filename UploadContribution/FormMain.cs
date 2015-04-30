@@ -39,7 +39,7 @@ namespace UploadContribution
             startWatching();   // watch in one folder
 
            
-
+            
             updateStatus("");
             tsLabelDestination.Text = Program.DestinationFolder;
             tsLabelWatchFolder.Text = Program.WatchFolder;
@@ -47,7 +47,7 @@ namespace UploadContribution
             string ver = string.Format("{0} {1}", Assembly.GetExecutingAssembly().GetName().Name, Assembly.GetExecutingAssembly().GetName().Version);
             this.Text =  ver + " - " + m_machineName;
 
-            productDestinationPath = Program.DestinationFolder + "/Bundle/Products/";
+            productDestinationPath = Program.DestinationFolder + "/Data/Products/";
             getFolderListToolStripMenuItem_Click(null, new EventArgs());
             
        }
@@ -236,12 +236,6 @@ namespace UploadContribution
             if (!XferJobInfo.IsDirectory(e.FullPath))
                   addFileToQueue(e);
 
-
-            //    addFolderToQueue(e);
-            //else
-            //    addFileToQueue(e);
-            
-            
         }
 
        
@@ -321,17 +315,19 @@ namespace UploadContribution
             {
                 foreach (string key in m_files.Keys)
                 {
-                    if (s.Contains(key))
+                    if (s.Contains(key.ToUpper()) || s.Contains(key))
                     {
                         string oldValue = s.Split(new char[] { '"' })[1];
                         replacement = s.Replace(oldValue, m_files[key]);
+                        addLine("Replaced " + oldValue + " with " + m_files[key]);
                         m_files.Remove(key);        // Once replace it, remove it from the list
                         break;
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                addLine(ex.Message, Color.Red);
             }
             return replacement;
         }
@@ -411,10 +407,10 @@ namespace UploadContribution
                 // Complete transfer and nothing in the queue
                 if ((m_jobs.Count == 0) && (m_jobQue.Count == 0))
                 {
-                    string path = Program.GetVersionFile();
-                    // Send VersionInfo file
-                    File.WriteAllLines(path, m_files.Values, Encoding.UTF8);
-                    Program.SendVersion(path);
+                    //string path = Program.GetVersionFile();
+                    //// Send VersionInfo file
+                    //File.WriteAllLines(path, m_files.Values, Encoding.UTF8);
+                    //Program.SendVersion(path);
 
                     if (m_files.Count > 0)              /// optionally update the remote BUild file
                         UpdateRemoteBuildFile();
@@ -469,8 +465,11 @@ namespace UploadContribution
                 }
                 else
                 {
+                    // Dump the build file
+                    dumpBuildFile(fileName);
                     // Process the file to add new Msi file into it
                     updateBuildFile(fileName);
+                    dumpBuildFile(fileName);
                     // Upload Build File
                     addLine("Updating Build File");
                     Program.SendBuildFile(fileName);
@@ -921,9 +920,8 @@ namespace UploadContribution
 
         }
 
-        private void buildFileToolStripMenuItem_Click(object sender, EventArgs e)
+        private void dumpBuildFile(string path)
         {
-            string path = Program.GetBuildFile();
             if (!String.IsNullOrEmpty(path))
             {
                 // dump the file to the screen
@@ -935,6 +933,12 @@ namespace UploadContribution
                     addLine(readText[i], Color.BlueViolet, true);
                 }
             }
+        }
+
+        private void buildFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string path = Program.GetBuildFile();
+            dumpBuildFile(path);
         }
 
         private void tsLabelDestination_Click(object sender, EventArgs e)

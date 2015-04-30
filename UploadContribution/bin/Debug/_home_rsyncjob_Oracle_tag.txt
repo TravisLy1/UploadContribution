@@ -1,0 +1,21 @@
+12/1/2014 2:37:53 PM,C:\DropFolder\CommunicatorInstall.log,/mnt/share/Share/Xfer/R1,2.35 MB,12/1/2014 2:37:59 PM,5,480.85 KB /sec
+12/1/2014 2:38:48 PM,C:\DropFolder\mapZ.bat,/mnt/share/Share/Xfer/R1,132 Bytes,12/1/2014 2:39:06 PM,18,7 Bytes /sec
+12/1/2014 2:36:57 PM,C:\DropFolder\large.zip,/mnt/share/Share/Xfer/R1,1 GB,12/1/2014 2:39:23 PM,25,41.07 MB /sec
+3/7/2015 4:35:00 PM, c:\dropfolder\Oracle\testDir2, /home/rsyncjob/Oracle, 11.77 KB, 3/7/2015 4:35:04 PM, 4 secs, 2.94 KB/sec, ALVTLY
+3/7/2015 4:40:05 PM, c:\dropfolder\Oracle\Installer, /home/rsyncjob/Oracle, 65.31 MB, 3/7/2015 4:40:51 PM, 45 secs, 1.45 MB/sec, ALVTLY
+3/7/2015 7:57:52 PM, c:\dropfolder\Oracle\BenchmarkFactory_x86_EN_ProductDescription.html, /home/rsyncjob/Oracle/Bundle/ProductsBenchmarkFactory_x86_EN, 243 Bytes, 3/7/2015 7:57:56 PM, 3 secs, 81 Bytes/sec, ALVTLY
+3/7/2015 7:57:57 PM, c:\dropfolder\Oracle\BenchmarkFactory_x86_ZH_ProductDescription.html, /home/rsyncjob/Oracle/Bundle/ProductsBenchmarkFactory_x86_ZH, 243 Bytes, 3/7/2015 7:58:01 PM, 3 secs, 81 Bytes/sec, ALVTLY
+3/7/2015 7:58:02 PM, c:\dropfolder\Oracle\CodeTesterOracle_x86_EN_ProductDescription.html, /home/rsyncjob/Oracle/Bundle/ProductsCodeTesterOracle_x86_EN, 237 Bytes, 3/7/2015 7:58:06 PM, 4 secs, 59 Bytes/sec, ALVTLY
+3/7/2015 7:58:07 PM, c:\dropfolder\Oracle\Installer_x86_EN_InstallerIntro.html, /home/rsyncjob/Oracle/Bundle/ProductsInstaller_x86_EN, 669 Bytes, 3/7/2015 7:58:11 PM, 3 secs, 223 Bytes/sec, ALVTLY
+3/7/2015 7:58:12 PM, c:\dropfolder\Oracle\Installer_x86_ZH_InstallerIntro.html, /home/rsyncjob/Oracle/Bundle/ProductsInstaller_x86_ZH, 735 Bytes, 3/7/2015 7:58:16 PM, 3 secs, 245 Bytes/sec, ALVTLY
+3/7/2015 7:58:17 PM, c:\dropfolder\Oracle\SpotlightOnOracle_x64_EN_ProductDescription.html, /home/rsyncjob/Oracle/Bundle/ProductsSpotlightOnOracle_x64_EN, 245 Bytes, 3/7/2015 7:58:21 PM, 3 secs, 81 Bytes/sec, ALVTLY
+3/7/2015 7:58:22 PM, c:\dropfolder\Oracle\SpotlightOnOracle_x86_EN_ProductDescription.html, /home/rsyncjob/Oracle/Bundle/ProductsSpotlightOnOracle_x86_EN, 245 Bytes, 3/7/2015 7:58:26 PM, 3 secs, 81 Bytes/sec, ALVTLY
+3/7/2015 7:58:27 PM, c:\dropfolder\Oracle\SQLOptimizerForOracle_x64_EN_ProductDescription.html, /home/rsyncjob/Oracle/Bundle/ProductsSQLOptimizerForOracle_x64_EN, 250 Bytes, 3/7/2015 7:58:31 PM, 3 secs, 83 Bytes/sec, ALVTLY
+3/7/2015 7:58:32 PM, c:\dropfolder\Oracle\SQLOptimizerForOracle_x64_ZH_ProductDescription.html, /home/rsyncjob/Oracle/Bundle/ProductsSQLOptimizerForOracle_x64_ZH, 250 Bytes, 3/7/2015 7:58:36 PM, 4 secs, 62 Bytes/sec, ALVTLY
+3/7/2015 7:58:37 PM, c:\dropfolder\Oracle\SQLOptimizerForOracle_x86_EN_ProductDescription.html, /home/rsyncjob/Oracle/Bundle/ProductsSQLOptimizerForOracle_x86_EN, 250 Bytes, 3/7/2015 7:58:41 PM, 3 secs, 83 Bytes/sec, ALVTLY
+3/7/2015 7:58:42 PM, c:\dropfolder\Oracle\BackupReporter_x86_EN_ProductDescription.html, /home/rsyncjob/Oracle/Bundle/ProductsBackupReporter_x86_EN, 241 Bytes, 3/7/2015 7:58:46 PM, 3 secs, 80 Bytes/sec, ALVTLY
+3/7/2015 7:58:47 PM, c:\dropfolder\Oracle\BenchmarkFactory_x64_EN_ProductDescription.html, /home/rsyncjob/Oracle/Bundle/ProductsBenchmarkFactory_x64_EN, 243 Bytes, 3/7/2015 7:58:51 PM, 3 secs, 81 Bytes/sec, ALVTLY
+3/7/2015 7:58:52 PM, c:\dropfolder\Oracle\BenchmarkFactory_x64_ZH_ProductDescription.html, /home/rsyncjob/Oracle/Bundle/ProductsBenchmarkFactory_x64_ZH, 243 Bytes, 3/7/2015 7:58:56 PM, 4 secs, 60 Bytes/sec, ALVTLY
+3/7/2015 8:31:19 PM, c:\dropfolder\Oracle\CodeTesterOracle_2.6.3.978_x86_EN.msi, /home/rsyncjob/Oracle/Bundle/ProductsCodeTesterOracle_x86_EN, 43.14 MB, 3/7/2015 8:32:30 PM, 70 secs, 631.07 KB/sec, ALVTLY
+3/7/2015 8:41:56 PM, c:\dropfolder\Oracle\Bundle, /home/rsyncjob/Oracle, 115.98 KB, 3/7/2015 8:42:00 PM, 4 secs, 29 KB/sec, ALVTLY
+3/7/2015 8:42:06 PM, c:\dropfolder\Oracle\Installer, /home/rsyncjob/Oracle, 361 KB, 3/7/2015 8:42:11 PM, 5 secs, 72.2 KB/sec, ALVTLY

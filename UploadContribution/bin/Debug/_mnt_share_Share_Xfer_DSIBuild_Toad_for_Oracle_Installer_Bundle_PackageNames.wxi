@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Include>
+  
+  <?define BackupReporter_x86_EN_Package_Define="BackupReporter_2.0.0.14_x86_EN.msi"?>
+  <?define BenchmarkFactory_x64_ZH_Package_Define="BenchmarkFactory_7.1.0.472_x64_ZH.msi"?>
+  <?define BenchmarkFactory_x86_EN_Package_Define="BenchmarkFactory_7.1.0.472_x86_EN.msi"?>
+  <?define BenchmarkFactory_x86_ZH_Package_Define="BenchmarkFactory_7.1.0.472_x86_ZH.msi"?>
+  <?define BenchmarkFactory_x64_EN_Package_Define="BenchmarkFactory_7.2.0.155_x64_En.msi"?>
+  <?define CodeTesterOracle_x86_EN_Package_Define="CodeTesterOracle_2.6.3.978_x86_EN.msi"?>
+  <?define ToadForOracle_x64_EN_Package_Define="ToadForOracle_12.7.0.48_x64_En.msi"?>
+  <?define ToadForOracle_x64_ZH_Package_Define="ToadForOracle_12.7.0.48_x64_Zh.msi"?>
+  <?define ToadForOracle_x86_EN_Package_Define="ToadForOracle_12.7.0.48_x86_En.msi"?>
+  <?define ToadForOracle_x86_ZH_Package_Define="ToadForOracle_12.7.0.48_x86_Zh.msi"?>
+  <?define SQLOptimizerForOracle_x64_multilang_Package_Define="SQLOptimizerForOracle_9.0.0.3387_x64_multilang.msi"?>
+  <?define SQLOptimizerForOracle_x86_multilang_Package_Define="SQLOptimizerForOracle_9.0.0.3387_x86_multilang.msi"?>
+  <?define SpotlightOnOracle_x64_EN_Package_Define="SpotlightOnOracle_10.2.1.1467_x64_EN.msi"?>
+  <?define SpotlightOnOracle_x86_EN_Package_Define="SpotlightOnOracle_10.2.1.1467_x86_EN.msi"?>
+  <?define ToadDataModeler_x86_EN_Package_Define="ToadDataModeler_5.3.4.2_x86_EN.msi"?>
+
+</Include>

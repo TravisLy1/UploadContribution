@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Include>
+
+  <?define BACKUPREPORTER_X86_EN_PACKAGE_DEFINE="BackupReporter_2.0.0.14_x86_EN.msi"?>
+
+  <?define BENCHMARKFACTORY_X64_ZH_PACKAGE_DEFINE="BenchmarkFactory_7.1.0.472_x64_ZH.msi"?>
+  <?define BENCHMARKFACTORY_X86_EN_PACKAGE_DEFINE="BenchmarkFactory_7.0.0.221_x86_EN.msi"?>
+  <?define BENCHMARKFACTORY_X86_ZH_PACKAGE_DEFINE="BenchmarkFactory_7.1.0.472_x86_ZH.msi"?>
+  <?define BENCHMARKFACTORY_X64_EN_PACKAGE_DEFINE="BenchmarkFactory_7.0.0.221_x64_EN.msi"?>
+
+  <?define BENCHMARKFACTORY_TRIAL_X86_EN_PACKAGE_DEFINE="BenchmarkFactory_Trial_7.0.0.221_x86_EN.msi"?>
+  <?define BENCHMARKFACTORY_TRIAL_X64_EN_PACKAGE_DEFINE="BenchmarkFactory_Trial_7.0.0.221_x64_EN.msi"?>
+
+  <?define CODETESTERORACLE_X86_EN_PACKAGE_DEFINE="CodeTesterOracle_2.6.2.974_x86_EN.msi"?>
+
+  <?define TOADFORORACLE_X64_EN_PACKAGE_DEFINE="ToadForOracle_12.5.0.99_x64_EN.msi"?>
+  <?define TOADFORORACLE_X64_ZH_PACKAGE_DEFINE="ToadForOracle_12.5.0.99_x64_ZH.msi"?>
+  <?define TOADFORORACLE_X86_EN_PACKAGE_DEFINE="ToadForOracle_12.5.0.99_x86_EN.msi"?>
+  <?define TOADFORORACLE_X86_ZH_PACKAGE_DEFINE="ToadForOracle_12.5.0.99_x86_ZH.msi"?>
+
+  <?define TOADFORORACLE_TRIAL_X86_EN_PACKAGE_DEFINE="ToadForOracle_Trial_12.5.0.99_x86_EN.msi"?>
+  <?define TOADFORORACLE_TRIAL_X64_EN_PACKAGE_DEFINE="ToadForOracle_Trial_12.5.0.99_x64_EN.msi"?>
+  <?define TOADFORORACLE_TRIAL_X86_ZH_PACKAGE_DEFINE="ToadForOracle_Trial_12.5.0.99_x86_ZH.msi"?>
+  <?define TOADFORORACLE_TRIAL_X64_ZH_PACKAGE_DEFINE="ToadForOracle_Trial_12.5.0.99_x64_ZH.msi"?>
+
+  <?define SQLOPTIMIZERFORORACLE_X64_MULTILANG_PACKAGE_DEFINE="SQLOptimizerForOracle_8.9.0.3012_x64_multilang.msi"?>
+  <?define SQLOPTIMIZERFORORACLE_X86_MULTILANG_PACKAGE_DEFINE="SQLOptimizerForOracle_8.9.0.3012_x86_multilang.msi"?>
+
+  <?define SQLOPTIMIZERFORORACLE_TRIAL_X86_MULTILANG_PACKAGE_DEFINE="SQLOptimizerForOracle_Trial_8.9.0.3012_x86_multilang.msi"?>
+  <?define SQLOPTIMIZERFORORACLE_TRIAL_X64_MULTILANG_PACKAGE_DEFINE="SQLOptimizerForOracle_Trial_8.9.0.3012_x64_multilang.msi"?>
+
+  <?define SPOTLIGHTONORACLE_X64_MULTILANG_PACKAGE_DEFINE="SpotlightOnOracle_10.2.0.1388_x64_multilang.msi"?>
+  <?define SPOTLIGHTONORACLE_X86_MULTILANG_PACKAGE_DEFINE="SpotlightOnOracle_10.2.0.1388_x86_multilang.msi"?>
+
+  <?define TOADDATAMODELER_X86_EN_PACKAGE_DEFINE="ToadDataModeler_5.2.4.25_x86_EN.msi"?>
+
+  <?define TOADFORMYSQL_FREEWARE_X86_EN_PACKAGE_DEFINE="ToadForMySQL_Freeware_7.2.0.2922_x86_EN.msi"?>
+
+</Include>

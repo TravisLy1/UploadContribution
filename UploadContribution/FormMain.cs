@@ -386,7 +386,7 @@ namespace UploadContribution
                         if (!m_files.ContainsKey(destFolder))
                             m_files.Add(destFolder, Path.GetFileName(xInfo.Source));
                         else
-                            m_files[destFolder] = xInfo.Source;
+                            m_files[destFolder] = Path.GetFileName(xInfo.Source);
                     }
                 }
 

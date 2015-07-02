@@ -957,6 +957,11 @@ namespace UploadContribution
             addLine("Folder = " +  FileNameMapping.CreateDestination(fileName));
         }
 
+        private void tsTestText_Click(object sender, EventArgs e)
+        {
+
+        }
+
        
 
      

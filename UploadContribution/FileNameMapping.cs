@@ -108,9 +108,20 @@ namespace UploadContribution
             }
             catch (Exception)
             { }
-            return destName;
+            return LookupFolder(destName);
         }
-
+        /// <summary>
+        /// Look up for any special mapping, if not found return the original
+        /// </summary>
+        /// <param name="keyName"></param>
+        /// <returns></returns>
+        private static string LookupFolder(string keyName)
+        {
+            if (Program.FolderMap.ContainsKey(keyName))
+                return Program.FolderMap[keyName];
+            else
+                return keyName;         // No special mapping
+        }
         /// <summary>
         /// Verify against the known list of remote folders
         /// </summary>

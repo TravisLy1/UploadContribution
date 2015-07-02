@@ -21,11 +21,13 @@ namespace UploadContribution
        // public static string LoginInfo;
         public static string WatchFolder;
         public static string DestinationFolder;
+        public static string WxiFileName;
         public static string ProductFamily;
         public static string WorkingDir;
         public static string TransferLog;
         public static string LocalTagFile;
         public static FormReport Report;
+        public static Dictionary<String, String> FolderMap;
 
         public static string RsyncResult;
         //public static FormMain mainForm;
@@ -60,36 +62,37 @@ namespace UploadContribution
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
            
-
-            // 3 arguments go to Sync Page  
-            if (args.Length > 2)
+            // arg0 - watch folder
+            // arg1 - destination folder
+            // arg2 - the name of the packageNames.wxi file 
+            // arg3 - folder mapping file - OPTIONAL
+            if (args.Length < 4)
             {
-                WatchFolder = args[0];
-                DestinationFolder = args[1];
-                f = new FolderSync();
-                Program.Settings.Verbose = false;
+                 // Usage message
+                string msg = string.Format("{0} {1}", Assembly.GetExecutingAssembly().GetName().Name,
+                                  "<monitor folder> <destination path> <packageNames.wxi> [folderMapping File]");
+                MessageBox.Show(msg);
+                Environment.Exit(2);
             }
-            else
+            // init
+            FolderMap = new Dictionary<string, string>();
+
+            if (args.Length == 4)
             {
-                // arg0 - watch folder
-                // arg1 - destination folder
-                if (args.Length < 2)
+                // open the map file
+                if (File.Exists(args[3]))
                 {
-
-                    // Usage message
-                    string msg = string.Format("{0} {1}", Assembly.GetExecutingAssembly().GetName().Name,
-                                      "<monitor folder> <destination path> ");
-                    MessageBox.Show(msg);
-                    Environment.Exit(2);
+                    ReadFolderMap(args[3]);
                 }
-                WatchFolder = args[0];
-                DestinationFolder = args[1];
-                // exract the product family from the folder path 
-                DirectoryInfo di = new DirectoryInfo(WatchFolder);
-                ProductFamily = di.Name;
-                Program.Settings.Verbose = true;
-                f = new FormMain();
             }
+            WatchFolder = args[0];
+            DestinationFolder = args[1];
+            WxiFileName = args[2];
+            // exract the product family from the folder path 
+            DirectoryInfo di = new DirectoryInfo(WatchFolder);
+            ProductFamily = di.Name;
+            Program.Settings.Verbose = true;
+            f = new FormMain();
 
             Report = (FormReport) f;
             Application.Run(f);
@@ -227,8 +230,8 @@ namespace UploadContribution
         {
             int status = -1;
             int retry = Program.settings.TransferMaxRetries;
-            string remoteFile = Program.DestinationFolder + "/Data/Products/PackageNames.wxi";
-            string localFile = GetTagFileName("PackageNames.wxi");
+            string remoteFile = Program.DestinationFolder + "/Data/Products/" + Program.WxiFileName;
+            string localFile = GetTagFileName(Program.WxiFileName);
 
             while ((status != 0) && (retry-- > 0))
             {
@@ -277,7 +280,7 @@ namespace UploadContribution
         {
             int status = -1;
             int retry = Program.settings.TransferMaxRetries;
-            string remoteFile = Program.DestinationFolder + "/Data/Products/PackageNames.wxi";
+            string remoteFile = Program.DestinationFolder + "/Data/Products/" + Program.WxiFileName;
             while ((status != 0) && (retry-- > 0))
             {
                 status = RunRSync(Program.Settings.LoginInfo, localFile, remoteFile, true);      // upload the file
@@ -286,6 +289,23 @@ namespace UploadContribution
             return status;
         }
     
+        /// <summary>
+        /// Open the mapp file and build the dictionary
+        /// </summary>
+        /// <param name="mapFile"></param>
+        public static void ReadFolderMap(string mapFile)
+        {
+ 
+            try
+            {
+                var dict = File.ReadLines(mapFile).Select(line => line.Split(',')).ToDictionary(line => line[0], line => line[1]);
+                FolderMap = new Dictionary<string, string>(dict);
+            }
+            catch (System.Exception )
+            {
+            }
+        }
+
     
         /// <summary>
         /// Run the Rsync process.  

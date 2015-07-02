@@ -116,6 +116,7 @@
             this.tsTestText.Name = "tsTestText";
             this.tsTestText.Size = new System.Drawing.Size(200, 23);
             this.tsTestText.Text = "TestName";
+            this.tsTestText.Click += new System.EventHandler(this.tsTestText_Click);
             this.tsTestText.DoubleClick += new System.EventHandler(this.tsTestText_DoubleClick);
             // 
             // checkDropFolderToolStripMenuItem

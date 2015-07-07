@@ -93,7 +93,7 @@ namespace UploadContribution
             ProductFamily = di.Name;
             Program.Settings.Verbose = true;
             f = new FormMain();
-
+            
             Report = (FormReport) f;
             Application.Run(f);
         }
@@ -298,7 +298,7 @@ namespace UploadContribution
  
             try
             {
-                var dict = File.ReadLines(mapFile).Select(line => line.Split(',')).ToDictionary(line => line[0], line => line[1]);
+                var dict = File.ReadLines(mapFile).Select(line => line.Split(',')).ToDictionary(line => line[0].ToUpper(), line => line[1]);
                 FolderMap = new Dictionary<string, string>(dict);
             }
             catch (System.Exception )

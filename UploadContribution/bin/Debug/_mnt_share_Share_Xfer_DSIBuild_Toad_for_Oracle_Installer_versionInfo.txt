@@ -1,1 +1,0 @@
-﻿SQLOptimizerForOracle_8.9.0.3012_x86_multilang.msi

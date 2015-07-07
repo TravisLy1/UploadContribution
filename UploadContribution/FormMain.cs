@@ -37,9 +37,7 @@ namespace UploadContribution
             m_files = new Dictionary<String, String>();
  
             startWatching();   // watch in one folder
-
-           
-            
+                     
             updateStatus("");
             tsLabelDestination.Text = Program.DestinationFolder;
             tsLabelWatchFolder.Text = Program.WatchFolder;
@@ -53,35 +51,7 @@ namespace UploadContribution
        }
 
        
-        /// <summary>
-        /// Validate the name
-        /// </summary>
-        /// <param name="xInfo"></param>
-        /// <returns></returns>
-        //private bool ValidateFileNamingConvention(XferJobInfo xInfo)
-        //{
-        //    string destinationFolder = FileNameMapping.CreateDestination(xInfo.Source);
-        //    string validateFolder = FileNameMapping.VerifyDestinationPath(destinationFolder);
-        //    string ownerEmail = FindOwnerEmail(Path.GetFullPath(xInfo.Source));
-        //    // Check the name of the file against the list of remote folders
-        //    // Findout the owner of the file
-        //    // Get the email address of the owner
-        //    if (String.IsNullOrEmpty(validateFolder))
-        //    {
-        //        // send an error email
-        //        string body = "Invalid Destination Path: " + destinationFolder + "\n\r";
-        //        body += "FileName = " + xInfo.Source;
-
-        //        string subject = "UploadContribution ERROR";
-        //        if (!String.IsNullOrEmpty(ownerEmail))
-        //            sendMail(subject, body, ownerEmail);
-        //        postErrorLog("ERROR", body, xInfo.Source);   // Always
-        //        addLine("ERROR: " + body, Color.Red);
-        //        return false;
-        //    }
-        //    else
-        //        return true;
-        //}
+       
 
         /// <summary>
         /// Add more details to error Log

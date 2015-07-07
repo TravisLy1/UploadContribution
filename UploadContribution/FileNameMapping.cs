@@ -117,8 +117,8 @@ namespace UploadContribution
         /// <returns></returns>
         private static string LookupFolder(string keyName)
         {
-            if (Program.FolderMap.ContainsKey(keyName))
-                return Program.FolderMap[keyName];
+            if (Program.FolderMap.ContainsKey(keyName.ToUpper()))
+                return Program.FolderMap[keyName.ToUpper()];
             else
                 return keyName;         // No special mapping
         }
